@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  background-color: #dadada;
+  padding-top: 30vh;
+}
+
+canvas {
+  margin: 0 auto;
+  display: block;
+  /* border: 1px solid black; */
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.controls > button {
+  padding: 1rem;
+}
