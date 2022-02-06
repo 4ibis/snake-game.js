@@ -1,6 +1,3 @@
-import Snake from './snake'
-import Food from './food'
-
 export type ColorString = string
 export type Pixel = number
 

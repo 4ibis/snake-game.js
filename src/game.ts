@@ -1,71 +1,83 @@
-import Canvas from './canvas'
+import Field from './field'
 import Snake from './snake'
 import GameNavigator from './navigator'
-import { Cell } from './types'
-import { CANVAS_PARAMS } from './constant'
-import Food from './food'
+import { Size } from './types'
+import { arrowsKeys, CANVAS_PARAMS, increaseDecreaseKeys, numberKeys, speedMap } from './constant'
 
 
 class Game {
     isRunning: boolean = false
-    public speed: number = 500
+    public speed: number
+    private speedView: HTMLElement
     private intervalID: any
     public snake: Snake
     public nav: GameNavigator
-    public field: Canvas
-    private food: Food
+    public field: Field
 
-    constructor(speed: number) {
-        this.field = new Canvas(CANVAS_PARAMS)
+    constructor(canvas: HTMLCanvasElement, speedView: HTMLElement, speed: number = 500) {
+        this.setupCanvas(canvas, CANVAS_PARAMS.size)
+        this.field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
         this.snake = new Snake()
         this.nav = new GameNavigator(this.snake, this.field)
         this.speed = speed
+        this.speedView = speedView
+        this.updateSpeedView()
         this.field.draw(this.snake)
-        this.putNewFoodOnField()
+        this.nav.putNewFoodOnField()
     }
 
-    setup() {
-
-    }
-
-    /**
-     *  moves cell to opposite side if it is out of canvas
-     */
-    private correctPosition(cell: Cell): void {
-        const [x, y] = cell
-        if (x < 0) {
-            cell[0] = this.field.maxXCell
-        } else if (x > this.field.maxXCell) {
-            cell[0] = 0
-        } else if (y < 0) {
-            cell[1] = this.field.maxYCell
-        } else if (y > this.field.maxYCell) {
-            cell[1] = 0
+    handleKeyInput(event: KeyboardEvent) {
+        const keyCode = event.code
+        if (keyCode === 'Space') {
+            this.toggleStartStop()
+        }
+        if (arrowsKeys.includes(keyCode)) {
+            let direction = keyCode.replace('Arrow', '')
+            this.snake.turn(direction)
+        }
+        if (numberKeys.includes(keyCode)) {
+            const speedIndex = keyCode.slice(-1)
+            this.changeSpeed(speedMap[speedIndex])
+        }
+        if (increaseDecreaseKeys.includes(keyCode)) {
+            this.tuneSpeed(keyCode)
         }
     }
 
-    moveHeadForward(): void {
-        const newHead: Cell = this.nav.getNextCell(this.snake.getHead(), this.snake.direction)
-        if (this.field.isOutOfCanvas(newHead)) {
-            this.correctPosition(newHead)
+    tuneSpeed(keyCode: string) {
+        let newSpeed = this.speed
+        const tuningStep = 50
+        if (keyCode.endsWith('Add')) {
+            newSpeed = this.speed - tuningStep < 0
+                ? 0
+                : this.speed - tuningStep
         }
-        if (this.nav.isOnSamePosition(this.food.position, newHead)) {
-            this.snake.grow()
-            this.putNewFoodOnField()
+        if (keyCode.endsWith('Subtract')) {
+            newSpeed = this.speed + tuningStep
         }
-        this.snake.setHead(newHead)
+        this.changeSpeed(newSpeed)
+    }
+
+    toggleStartStop(): void {
+        this.isRunning ? this.stop() : this.start()
+    }
+
+    setupCanvas(canvasElement: HTMLCanvasElement, size: Size): void {
+        const [width, height] = size
+        canvasElement.setAttribute('width', width.toString())
+        canvasElement.setAttribute('height', height.toString())
     }
 
     loop(): void {
-        this.moveHeadForward()
-        this.field.clean(this.snake.popTail())
+        this.nav.moveHeadForward()
         this.field.draw(this.snake)
+        this.field.clean(this.snake.popTail())
+        this.field.drawGrid()
     }
 
-    start(gameSpeed?: number | null): void {
+    start(gameSpeed: number = this.speed): void {
         this.stop()
-        this.setup()
-        this.intervalID = setInterval(() => this.loop(), gameSpeed || this.speed)
+        this.intervalID = setInterval(() => this.loop(), gameSpeed)
         this.isRunning = true
     }
 
@@ -76,40 +88,17 @@ class Game {
         }
     }
 
-    isCellOnSnake(cell): boolean {
-        let result = false
-        this.snake.body.some(cellOfSnake => (result = this.nav.isOnSamePosition(cell, cellOfSnake)))
-        return result
-    }
-
-    getRandomNumber(min: number = 0, max: number): number {
-        const randomFloat = Math.random() * (min - max) + max
-        return Math.floor(randomFloat)
-    }
-
-    createRandomCell(): Cell {
-        const x = this.getRandomNumber(0, this.field.maxXCell)
-        const y = this.getRandomNumber(0, this.field.maxYCell)
-        return [x, y]
-    }
-
-    getNewFood(): Food {
-        let cell
-        do {
-            cell = this.createRandomCell()
-        } while (this.isCellOnSnake(cell))
-        return new Food(cell)
-    }
-
-    putNewFoodOnField(): void {
-        this.food = this.getNewFood()
-        this.field.draw(this.food)
-    }
-
     changeSpeed(speed: number): void {
         this.speed = speed
+        this.updateSpeedView()
         this.start()
     }
+
+    updateSpeedView() {
+        const speedValue = 1000 / this.speed
+        this.speedView.innerText = speedValue.toFixed(1)
+    }
+
 }
 
 export default Game

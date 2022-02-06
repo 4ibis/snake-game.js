@@ -32,6 +32,25 @@ class Snake implements BaseFieldFigure {
         return this.body.length
     }
 
+    turn(direction: string): void {
+        switch (direction) {
+            case 'Up':
+                this.turnUp()
+                break
+            case 'Right':
+                this.turnRight()
+                break
+            case 'Down':
+                this.turnDown()
+                break
+            case 'Left':
+                this.turnLeft()
+                break
+            default:
+                throw new Error('Wrong direction')
+        }
+    }
+
     turnUp(): void {
         if (this.direction !== DIRECTIONS.down) {
             this.direction = DIRECTIONS.up
@@ -55,7 +74,6 @@ class Snake implements BaseFieldFigure {
             this.direction = DIRECTIONS.left
         }
     }
-
 }
 
 export default Snake

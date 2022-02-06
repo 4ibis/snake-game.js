@@ -1,45 +1,37 @@
-import Snake from './snake'
-import { Cell, ColorString, Coordinates, BaseFieldFigure, Pixel, RenderingParams, Size } from './types'
-import Food from './food'
+import { BaseFieldFigure, Cell, ColorString, Coordinates, Pixel, RenderingParams, Size } from './types'
 
 
 export interface CanvasParams {
     size: Size
     cellSize: number
-    canvas: HTMLCanvasElement
     gridColor: ColorString
     bgColor: ColorString
 }
 
-class Canvas {
+class Field {
     width: Pixel
     height: Pixel
     cellSize: number
     context: CanvasRenderingContext2D
     gridColor: string
-    fillStyle: string
     maxXCell: number
     maxYCell: number
 
-    constructor(params: CanvasParams) {
+    constructor(context: CanvasRenderingContext2D, params: CanvasParams) {
         const [width, height] = params.size
         this.width = width
         this.height = height
-        this.context = params.canvas.getContext('2d')
+        this.context = context
         this.cellSize = params.cellSize
-        this.context.fillStyle = params.bgColor
-        this.context.fillRect(0, 0, this.height, this.width)
-        this.context.fillStyle = this.fillStyle
         this.gridColor = params.gridColor
-        this.setupCanvas(params.canvas, params.size)
         this.initBoundaries()
+        this.fillBackground(params.bgColor)
         this.drawGrid()
     }
 
-    setupCanvas(canvasElement, size/*:Size*/) {
-        const [width, height] = size
-        canvasElement.setAttribute('width', width.toString())
-        canvasElement.setAttribute('height', height.toString())
+    fillBackground(color: string): void {
+        this.context.fillStyle = color
+        this.context.fillRect(0, 0, this.height, this.width)
     }
 
     isOutOfCanvas([x, y]: Cell): boolean {
@@ -62,7 +54,6 @@ class Canvas {
     clean(cell: Cell) {
         let coordinates = this.getCoordinates(cell)
         this.context.clearRect(...coordinates, this.cellSize, this.cellSize)
-        this.drawGrid()
     }
 
     drawCell(cell: Cell, color: ColorString) {
@@ -75,7 +66,6 @@ class Canvas {
     }
 
     draw(figure: BaseFieldFigure) {
-        this.fillStyle = figure.color
         figure.body.forEach(cell => this.drawCell(cell, figure.color))
     }
 
@@ -95,4 +85,4 @@ class Canvas {
     }
 }
 
-export default Canvas
+export default Field

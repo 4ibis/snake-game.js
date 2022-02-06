@@ -8,27 +8,19 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="wrapper">
-    <canvas id="canvas"></canvas>
-</div>
-<div class="controls">
-    <button class="startStop">Старт / Стоп</button>
-    <div class="speed">
-        <label for="speed">Скорость</label>
-        <form id="speed">
-            <input id="one" value="1000" type="radio" name="speed" checked>
-            <label for="one">1</label>
-            <input id="two" value="750" type="radio" name="speed">
-            <label for="two">2</label>
-            <input id="three" value="500" type="radio" name="speed">
-            <label for="three">3</label>
-            <input id="four" type="radio" value="250" name="speed">
-            <label for="four">4</label>
-            <input id="five" type="radio" value="125" name="speed">
-            <label for="five">5</label>
-        </form>
+<main>
+    <div class="wrapper">
+        <canvas id="canvas"></canvas>
     </div>
-</div>
+    <section class="speed">
+        <p>Скорость: <span class="current-speed"></span></p>
+    </section>
+    <section class="navigation-info">
+        <p>"Пробел" - старт/стоп</p>
+        <p>+/- увеличить/уменьшить скорость</p>
+        <p>Цифры 1-5 меняют скорость</p>
+    </section>
+</main>
 <script src="dist/bundle.js"></script>
 </body>
 </html>
