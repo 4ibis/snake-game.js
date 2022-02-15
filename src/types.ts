@@ -15,7 +15,9 @@ export type Size = [Width, Height]
 
 export type RenderingParams = [X, Y, Width, Height]
 
+export type FigureBody = Cell[]
+
 export interface BaseFieldFigure {
-    body: Cell[]
+    body: FigureBody
     color: ColorString
 }

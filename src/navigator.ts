@@ -1,7 +1,7 @@
 import { Cell } from './types'
 import Snake from './snake'
 import Field from './field'
-import Food from "./food";
+import Food from './food'
 
 class GameNavigator {
 
@@ -12,6 +12,16 @@ class GameNavigator {
     constructor(snake: Snake, field: Field) {
         this.snake = snake
         this.field = field
+    }
+
+    reDraw() {
+        this.drawSnake()
+        this.field.clean(this.snake.popTail())
+        this.field.drawGrid()
+    }
+
+    drawSnake() {
+        this.field.drawFigure(this.snake)
     }
 
     getNewFood(): Food {
@@ -41,7 +51,7 @@ class GameNavigator {
 
     putNewFoodOnField(): void {
         this.food = this.getNewFood()
-        this.field.draw(this.food)
+        this.field.drawFigure(this.food)
     }
 
     moveHeadForward(): void {
@@ -100,6 +110,9 @@ class GameNavigator {
         return newHead
     }
 
+    turn(direction: string) {
+        this.snake.turn(direction)
+    }
 }
 
 export default GameNavigator

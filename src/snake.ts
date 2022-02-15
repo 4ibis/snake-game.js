@@ -1,15 +1,16 @@
 import { DIRECTIONS } from './constant'
-import { BaseFieldFigure, Cell } from './types'
+import { BaseFieldFigure, Cell, FigureBody } from './types'
 
 class Snake implements BaseFieldFigure {
 
-    body: Cell[] = [
-        [10, 12],
-        [10, 13],
-    ]
+    body: FigureBody
 
     direction: string = DIRECTIONS.up
     color: string = 'green'
+
+    constructor(body: Cell[]) {
+        this.body = body
+    }
 
     getHead(): Cell {
         return this.body[0]

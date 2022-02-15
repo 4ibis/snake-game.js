@@ -46,9 +46,8 @@ class Field {
     }
 
     getCoordinates(cell: Cell): Coordinates {
-        let [x, y] = cell
-        const result = [x * this.cellSize, y * this.cellSize]
-        return result as Cell
+        const [x, y] = cell
+        return [x * this.cellSize, y * this.cellSize] as Coordinates
     }
 
     clean(cell: Cell) {
@@ -57,15 +56,14 @@ class Field {
     }
 
     drawCell(cell: Cell, color: ColorString) {
-        const [x, y] = cell
-        const coordinates: Cell = [x * this.cellSize, y * this.cellSize]
+        const coordinates = this.getCoordinates(cell)
         const size: Size = [this.cellSize, this.cellSize]
         const params: RenderingParams = [...coordinates, ...size]
         this.context.fillStyle = color
         this.context.fillRect(...params)
     }
 
-    draw(figure: BaseFieldFigure) {
+    drawFigure(figure: BaseFieldFigure) {
         figure.body.forEach(cell => this.drawCell(cell, figure.color))
     }
 

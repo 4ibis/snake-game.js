@@ -1,7 +1,7 @@
 import Field from './field'
 import Snake from './snake'
 import GameNavigator from './navigator'
-import { Size } from './types'
+import { FigureBody, Size } from './types'
 import { arrowsKeys, CANVAS_PARAMS, increaseDecreaseKeys, numberKeys, speedMap } from './constant'
 
 
@@ -10,20 +10,20 @@ class Game {
     public speed: number
     private speedView: HTMLElement
     private intervalID: any
-    public snake: Snake
-    public nav: GameNavigator
-    public field: Field
+    public navigator: GameNavigator
 
     constructor(canvas: HTMLCanvasElement, speedView: HTMLElement, speed: number = 500) {
         this.setupCanvas(canvas, CANVAS_PARAMS.size)
-        this.field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
-        this.snake = new Snake()
-        this.nav = new GameNavigator(this.snake, this.field)
+        //todo: generate snake's body at the field's center
+        const snakeBody = [ [10, 12], [10, 13] ] as FigureBody
+        const snake = new Snake(snakeBody)
+        const field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
+        this.navigator = new GameNavigator(snake, field)
         this.speed = speed
         this.speedView = speedView
         this.updateSpeedView()
-        this.field.draw(this.snake)
-        this.nav.putNewFoodOnField()
+        this.navigator.drawSnake()
+        this.navigator.putNewFoodOnField()
     }
 
     handleKeyInput(event: KeyboardEvent) {
@@ -33,7 +33,7 @@ class Game {
         }
         if (arrowsKeys.includes(keyCode)) {
             let direction = keyCode.replace('Arrow', '')
-            this.snake.turn(direction)
+            this.navigator.turn(direction)
         }
         if (numberKeys.includes(keyCode)) {
             const speedIndex = keyCode.slice(-1)
@@ -69,10 +69,8 @@ class Game {
     }
 
     loop(): void {
-        this.nav.moveHeadForward()
-        this.field.draw(this.snake)
-        this.field.clean(this.snake.popTail())
-        this.field.drawGrid()
+        this.navigator.moveHeadForward()
+        this.navigator.reDraw()
     }
 
     start(gameSpeed: number = this.speed): void {
