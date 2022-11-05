@@ -1,5 +1,12 @@
-import { BaseFieldFigure, Cell, ColorString, Coordinates, Pixel, RenderingParams, Size } from './types'
-
+import {
+    BaseFieldFigure,
+    Cell,
+    ColorString,
+    Coordinates,
+    Pixel,
+    RenderingParams,
+    Size,
+} from './types'
 
 export interface CanvasParams {
     size: Size
@@ -51,7 +58,7 @@ class Field {
     }
 
     clean(cell: Cell) {
-        let coordinates = this.getCoordinates(cell)
+        const coordinates = this.getCoordinates(cell)
         this.context.clearRect(...coordinates, this.cellSize, this.cellSize)
     }
 
@@ -64,7 +71,7 @@ class Field {
     }
 
     drawFigure(figure: BaseFieldFigure) {
-        figure.body.forEach(cell => this.drawCell(cell, figure.color))
+        figure.body.forEach((cell) => this.drawCell(cell, figure.color))
     }
 
     drawLine(startPoint: Cell, endPoint: Cell) {

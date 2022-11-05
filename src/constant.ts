@@ -7,17 +7,9 @@ export const DIRECTIONS = {
     left: 'left',
 }
 
-export const arrowsKeys = [
-    'ArrowDown',
-    'ArrowRight',
-    'ArrowUp',
-    'ArrowLeft'
-]
+export const arrowsKeys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']
 
-export const increaseDecreaseKeys = [
-    'NumpadSubtract',
-    'NumpadAdd',
-]
+export const increaseDecreaseKeys = ['NumpadSubtract', 'NumpadAdd']
 
 export const numberKeys = [
     'Numpad1',
@@ -42,7 +34,9 @@ export const speedMap = {
 
 const width = 401
 const height = 401
-export const canvasID: string = 'canvas'
+
+export const canvasID = 'canvas'
+
 export const CANVAS_PARAMS: CanvasParams = {
     size: [width, height],
     cellSize: 20,

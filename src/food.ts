@@ -1,7 +1,6 @@
 import { BaseFieldFigure, Cell, ColorString } from './types'
 
 class Food implements BaseFieldFigure {
-
     body: Cell[]
     color: ColorString = 'red'
 

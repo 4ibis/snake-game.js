@@ -4,7 +4,6 @@ import Field from './field'
 import Food from './food'
 
 class GameNavigator {
-
     private food: Food
     private snake: Snake
     private field: Field
@@ -34,11 +33,13 @@ class GameNavigator {
 
     isCellUnderSnake(cell: Cell): boolean {
         let result = false
-        this.snake.body.some(cellOfSnake => (result = this.isOnSamePosition(cell, cellOfSnake)))
+        this.snake.body.some(
+            (cellOfSnake) => (result = this.isOnSamePosition(cell, cellOfSnake))
+        )
         return result
     }
 
-    getRandomNumber(min: number = 0, max: number): number {
+    getRandomNumber(min = 0, max: number): number {
         const randomFloat = Math.random() * (min - max) + max
         return Math.floor(randomFloat)
     }

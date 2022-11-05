@@ -2,20 +2,28 @@ import Field from './field'
 import Snake from './snake'
 import GameNavigator from './navigator'
 import { FigureBody, Size } from './types'
-import { arrowsKeys, CANVAS_PARAMS, increaseDecreaseKeys, numberKeys, speedMap } from './constant'
-
+import {
+    arrowsKeys,
+    CANVAS_PARAMS,
+    increaseDecreaseKeys,
+    numberKeys,
+    speedMap,
+} from './constant'
 
 class Game {
-    isRunning: boolean = false
+    isRunning = false
     public speed: number
     private speedView: HTMLElement
-    private intervalID: any
+    private intervalID: number
     public navigator: GameNavigator
 
-    constructor(canvas: HTMLCanvasElement, speedView: HTMLElement, speed: number = 500) {
+    constructor(canvas: HTMLCanvasElement, speedView: HTMLElement, speed = 500) {
         this.setupCanvas(canvas, CANVAS_PARAMS.size)
         //todo: generate snake's body at the field's center
-        const snakeBody = [ [10, 12], [10, 13] ] as FigureBody
+        const snakeBody = [
+            [10, 12],
+            [10, 13],
+        ] as FigureBody
         const snake = new Snake(snakeBody)
         const field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
         this.navigator = new GameNavigator(snake, field)
@@ -32,7 +40,7 @@ class Game {
             this.toggleStartStop()
         }
         if (arrowsKeys.includes(keyCode)) {
-            let direction = keyCode.replace('Arrow', '')
+            const direction = keyCode.replace('Arrow', '')
             this.navigator.turn(direction)
         }
         if (numberKeys.includes(keyCode)) {
@@ -48,9 +56,7 @@ class Game {
         let newSpeed = this.speed
         const tuningStep = 50
         if (keyCode.endsWith('Add')) {
-            newSpeed = this.speed - tuningStep < 0
-                ? 0
-                : this.speed - tuningStep
+            newSpeed = this.speed - tuningStep < 0 ? 0 : this.speed - tuningStep
         }
         if (keyCode.endsWith('Subtract')) {
             newSpeed = this.speed + tuningStep
@@ -75,7 +81,7 @@ class Game {
 
     start(gameSpeed: number = this.speed): void {
         this.stop()
-        this.intervalID = setInterval(() => this.loop(), gameSpeed)
+        this.intervalID = window.setInterval(() => this.loop(), gameSpeed)
         this.isRunning = true
     }
 
@@ -96,7 +102,6 @@ class Game {
         const speedValue = 1000 / this.speed
         this.speedView.innerText = speedValue.toFixed(1)
     }
-
 }
 
 export default Game
