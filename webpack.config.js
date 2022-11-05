@@ -1,17 +1,17 @@
 module.exports = {
-    entry: "./snake-game.js",
+    entry: './index.js',
     output: {
-        filename: "./bundle.js",
+        filename: './bundle.js',
     },
     mode: 'development',
-    devtool: "source-map",
+    devtool: 'source-map',
     resolve: {
-        extensions: ["", ".webpack.js", ".web.js", ".ts", ".js"],
+        extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
     },
     module: {
         rules: [
-            { test: /\.ts?$/, loader: "ts-loader" },
-            { test: /\.js$/, loader: "source-map-loader" },
+            { test: /\.ts?$/, loader: 'ts-loader' },
+            { test: /\.js$/, loader: 'source-map-loader' },
         ],
     },
-};
+}
