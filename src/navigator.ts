@@ -15,7 +15,6 @@ class GameNavigator {
 
     reDraw() {
         this.drawSnake()
-        this.field.clean(this.snake.popTail())
         this.field.drawGrid()
     }
 
@@ -24,7 +23,7 @@ class GameNavigator {
     }
 
     getNewFood(): Food {
-        let cell
+        let cell: Cell
         do {
             cell = this.createRandomCell()
         } while (this.isCellUnderSnake(cell))
@@ -32,14 +31,11 @@ class GameNavigator {
     }
 
     isCellUnderSnake(cell: Cell): boolean {
-        let result = false
-        this.snake.body.some(
-            (cellOfSnake) => (result = this.isOnSamePosition(cell, cellOfSnake))
-        )
-        return result
+        const check = (cellOfSnake: Cell) => this.isOnSamePosition(cell, cellOfSnake)
+        return this.snake.body.some(check)
     }
 
-    getRandomNumber(min = 0, max: number): number {
+    getRandomNumber(min: number, max: number): number {
         const randomFloat = Math.random() * (min - max) + max
         return Math.floor(randomFloat)
     }
@@ -55,16 +51,28 @@ class GameNavigator {
         this.field.drawFigure(this.food)
     }
 
+    move(): void {
+        this.moveHeadForward()
+        this.moveTail()
+    }
+
     moveHeadForward(): void {
         const newHead: Cell = this.getNextCell(this.snake.getHead(), this.snake.direction)
         if (this.field.isOutOfCanvas(newHead)) {
             this.correctPosition(newHead)
         }
         if (this.isOnSamePosition(this.food.position, newHead)) {
-            this.snake.grow()
+            this.snake.isGrowing = true
             this.putNewFoodOnField()
         }
         this.snake.setHead(newHead)
+    }
+
+    moveTail(): void {
+        if (!this.snake.isGrowing) {
+            this.field.clean(this.snake.popTail())
+        }
+        this.snake.isGrowing = false
     }
 
     /**

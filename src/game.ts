@@ -2,28 +2,22 @@ import Field from './field'
 import Snake from './snake'
 import GameNavigator from './navigator'
 import { FigureBody, Size } from './types'
-import {
-    arrowsKeys,
-    CANVAS_PARAMS,
-    increaseDecreaseKeys,
-    numberKeys,
-    speedMap,
-} from './constant'
+import { arrowsKeys, CANVAS_PARAMS, increaseDecreaseKeys, numberKeys, speedMap } from './constant'
 
 class Game {
-    isRunning = false
     public speed: number
     private speedView: HTMLElement
     private intervalID: number
     public navigator: GameNavigator
+    private isRunning: boolean = false
 
     constructor(canvas: HTMLCanvasElement, speedView: HTMLElement, speed = 500) {
         this.setupCanvas(canvas, CANVAS_PARAMS.size)
         //todo: generate snake's body at the field's center
-        const snakeBody = [
+        const snakeBody: FigureBody = [
             [10, 12],
             [10, 13],
-        ] as FigureBody
+        ]
         const snake = new Snake(snakeBody)
         const field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
         this.navigator = new GameNavigator(snake, field)
@@ -35,7 +29,10 @@ class Game {
     }
 
     handleKeyInput(event: KeyboardEvent) {
+        event.preventDefault()
         const keyCode = event.code
+        // todo: use digit keyCodes ?
+        console.log('event', '|', event.key, '|')
         if (keyCode === 'Space') {
             this.toggleStartStop()
         }
@@ -75,7 +72,7 @@ class Game {
     }
 
     loop(): void {
-        this.navigator.moveHeadForward()
+        this.navigator.move()
         this.navigator.reDraw()
     }
 

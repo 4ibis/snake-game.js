@@ -1,11 +1,11 @@
 import { DIRECTIONS } from './constant'
-import { BaseFieldFigure, Cell, FigureBody } from './types'
+import { BaseFieldFigure, Cell, ColorString, FigureBody } from './types'
 
 class Snake implements BaseFieldFigure {
     body: FigureBody
-
+    isGrowing: boolean = false
     direction: string = DIRECTIONS.up
-    color = 'green'
+    color: ColorString = 'green'
 
     constructor(body: Cell[]) {
         this.body = body
@@ -21,11 +21,6 @@ class Snake implements BaseFieldFigure {
 
     popTail(): Cell {
         return this.body.pop()
-    }
-
-    grow(): void {
-        const [cell] = this.body
-        this.body.unshift(cell)
     }
 
     get size(): number {
