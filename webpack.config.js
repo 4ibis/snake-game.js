@@ -1,7 +1,9 @@
+const path = require('path')
+
 module.exports = {
     entry: './index.js',
     output: {
-        filename: './bundle.js',
+        filename: './dist/bundle.js',
     },
     mode: 'development',
     devtool: 'source-map',
@@ -13,5 +15,12 @@ module.exports = {
             { test: /\.ts?$/, loader: 'ts-loader' },
             { test: /\.js$/, loader: 'source-map-loader' },
         ],
+    },
+    devServer: {
+        static: {
+            directory: path.join(__dirname),
+        },
+        compress: true,
+        port: 9000,
     },
 }
