@@ -1,27 +1,33 @@
 body {
-  margin: 0;
-  background-color: #dadada;
-  padding-top: 30vh;
+    margin: 0;
+    background-color: #dadada;
 }
 
 canvas {
-  margin: 0 auto;
-  display: block;
-  background-color: white;
+    margin: 0 auto;
+    display: block;
+    background-color: white;
 }
 
 .navigation-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-  margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 0.3rem;
 }
 
 .speed {
-  text-align: center;
+    text-align: center;
 }
 
 .navigation-info p {
-  margin: 0;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
 }

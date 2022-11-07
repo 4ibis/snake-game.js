@@ -11,17 +11,19 @@
 
 <body>
     <main>
-        <div class="wrapper">
-            <canvas id="canvas"></canvas>
+        <div class="container">
+            <div class="wrapper">
+                <canvas id="canvas"></canvas>
+            </div>
+            <section class="speed">
+                <p>Скорость: <span class="current-speed"></span></p>
+            </section>
+            <section class="navigation-info">
+                <p>"Пробел" - старт/стоп</p>
+                <p>+/- увеличить/уменьшить скорость</p>
+                <p>Цифры 1-5 меняют скорость</p>
+            </section>
         </div>
-        <section class="speed">
-            <p>Скорость: <span class="current-speed"></span></p>
-        </section>
-        <section class="navigation-info">
-            <p>"Пробел" - старт/стоп</p>
-            <p>+/- увеличить/уменьшить скорость</p>
-            <p>Цифры 1-5 меняют скорость</p>
-        </section>
     </main>
     <script src="dist/bundle.js"></script>
 </body>
