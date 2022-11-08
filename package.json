@@ -1,6 +1,6 @@
 {
     "name": "snake-game.js",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "JS implementation of Snake Game",
     "main": "index.js",
     "scripts": {
@@ -9,8 +9,8 @@
         "serve": "npx http-server",
         "test": "jest"
     },
-    "author": "treus",
-    "license": "ISC",
+    "author": "Peter Chibisov",
+    "license": "MIT",
     "devDependencies": {
         "@types/jest": "^27.4.0",
         "@typescript-eslint/eslint-plugin": "^5.42.0",
