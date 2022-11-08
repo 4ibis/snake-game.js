@@ -2,12 +2,15 @@ const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const bundle_name = 'bundle.js'
+const public_dir = 'docs'
+
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     entry: './index.js',
     output: {
-        path: path.resolve(__dirname, 'public/'),
-        filename: 'bundle.js',
+        path: path.resolve(__dirname, public_dir),
+        filename: bundle_name,
     },
     plugins: [
         new CopyPlugin({
@@ -17,14 +20,13 @@ module.exports = {
             inject: false,
             template: 'index.ejs',
             templateParameters: {
-                script_src: 'bundle.js',
-                styles_src: 'styles.css',
+                script_src: bundle_name,
                 title: 'alpha | snake.js',
             },
         }),
     ],
     resolve: {
-        extensions: ['', '.ts', '.js'],
+        extensions: ['.ts', '.js'],
     },
     module: {
         rules: [{ test: /\.ts?$/, loader: 'ts-loader' }],

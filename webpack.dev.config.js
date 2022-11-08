@@ -1,11 +1,13 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const bundle_name = 'bundle.js'
+
 module.exports = {
     entry: './index.js',
     output: {
         path: path.resolve(__dirname),
-        filename: 'bundle.js',
+        filename: bundle_name,
     },
     mode: 'development',
     devtool: 'source-map',
@@ -20,14 +22,13 @@ module.exports = {
             inject: false,
             template: 'index.ejs',
             templateParameters: {
-                script_src: 'bundle.js',
-                styles_src: 'styles.css',
+                script_src: bundle_name,
                 title: 'dev | Snake.js',
             },
         }),
     ],
     resolve: {
-        extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
+        extensions: ['.ts', '.js'],
     },
     devServer: {
         static: {
