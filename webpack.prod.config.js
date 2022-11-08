@@ -2,7 +2,10 @@ const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const timestamp = new Date().getTime()
 const bundle_name = 'bundle.js'
+const script_src = `${bundle_name}?v=${timestamp}`
+const styles_src = `styles.css?v=${timestamp}`
 const public_dir = 'docs'
 
 module.exports = {
@@ -20,8 +23,9 @@ module.exports = {
             inject: false,
             template: 'index.ejs',
             templateParameters: {
-                script_src: bundle_name,
+                script_src,
                 title: 'alpha | snake.js',
+                styles_src,
             },
         }),
     ],

@@ -23,6 +23,7 @@ module.exports = {
             template: 'index.ejs',
             templateParameters: {
                 script_src: bundle_name,
+                styles_src: 'styles.css',
                 title: 'dev | Snake.js',
             },
         }),
