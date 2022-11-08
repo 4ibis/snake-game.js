@@ -15,11 +15,11 @@ class GameNavigator {
 
     reDraw() {
         this.drawSnake()
-        this.field.drawGrid()
     }
 
     drawSnake() {
         this.field.drawFigure(this.snake)
+        this.field.drawGrid()
     }
 
     getNewFood(): Food {

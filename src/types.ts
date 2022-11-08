@@ -21,3 +21,8 @@ export interface BaseFieldFigure {
     body: FigureBody
     color: ColorString
 }
+
+export type Controls = {
+    speedUp: HTMLElement
+    speedDown: HTMLElement
+}

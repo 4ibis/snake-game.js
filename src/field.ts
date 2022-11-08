@@ -36,18 +36,18 @@ class Field {
         this.drawGrid()
     }
 
-    fillBackground(color: string): void {
+    private fillBackground(color: string): void {
         this.context.fillStyle = color
         this.context.fillRect(0, 0, this.height, this.width)
     }
 
-    isOutOfCanvas([x, y]: Cell): boolean {
+    public isOutOfCanvas([x, y]: Cell): boolean {
         const xIsOut = x < 0 || x > this.maxXCell
         const yIsOut = y < 0 || y > this.maxYCell
         return xIsOut || yIsOut
     }
 
-    initBoundaries() {
+    private initBoundaries() {
         this.maxXCell = Math.floor((this.width - this.cellSize) / this.cellSize)
         this.maxYCell = Math.floor((this.height - this.cellSize) / this.cellSize)
     }
@@ -62,7 +62,7 @@ class Field {
         this.context.clearRect(...coordinates, this.cellSize, this.cellSize)
     }
 
-    drawCell(cell: Cell, color: ColorString) {
+    private drawCell(cell: Cell, color: ColorString) {
         const coordinates = this.getCoordinates(cell)
         const size: Size = [this.cellSize, this.cellSize]
         const params: RenderingParams = [...coordinates, ...size]
@@ -72,9 +72,10 @@ class Field {
 
     drawFigure(figure: BaseFieldFigure) {
         figure.body.forEach((cell) => this.drawCell(cell, figure.color))
+        this.drawGrid()
     }
 
-    drawLine(startPoint: Cell, endPoint: Cell) {
+    private drawLine(startPoint: Cell, endPoint: Cell) {
         this.context.moveTo(...startPoint)
         this.context.lineTo(...endPoint)
     }

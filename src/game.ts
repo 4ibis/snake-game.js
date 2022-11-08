@@ -1,11 +1,20 @@
 import Field from './field'
 import Snake from './snake'
 import GameNavigator from './navigator'
-import { FigureBody, Size } from './types'
-import { arrowsKeys, CANVAS_PARAMS, increaseDecreaseKeys, numberKeys, speedMap } from './constant'
+import { Controls, FigureBody, Size } from './types'
+import {
+    ARROW_KEYS,
+    CANVAS_PARAMS,
+    DECREASE_KEYS,
+    INCREASE_KEYS,
+    numberKeys,
+    PLAY_PAUSE_KEYS,
+    speedMap,
+} from './constant'
 
 class Game {
     public speed: number
+    private speedChangeStep: number = 25
     private speedView: HTMLElement
     private intervalID: number
     public navigator: GameNavigator
@@ -28,37 +37,48 @@ class Game {
         this.navigator.putNewFoodOnField()
     }
 
+    initControls(controls: Controls) {
+        controls.speedUp.addEventListener('click', () => this.speedUp())
+        controls.speedDown.addEventListener('click', () => this.speedDown())
+    }
+
     handleKeyInput(event: KeyboardEvent) {
-        event.preventDefault()
         const keyCode = event.code
-        // todo: use digit keyCodes ?
-        console.log('event', '|', event.key, '|')
-        if (keyCode === 'Space') {
-            this.toggleStartStop()
-        }
-        if (arrowsKeys.includes(keyCode)) {
+        const ALL_CONTROL_KEYS = [].concat(ARROW_KEYS, numberKeys, INCREASE_KEYS, DECREASE_KEYS)
+        const SPEED_KYES = [].concat(INCREASE_KEYS, DECREASE_KEYS)
+
+        // console.log('keyCode', keyCode)
+        if (ALL_CONTROL_KEYS.includes(keyCode)) event.preventDefault()
+
+        if (PLAY_PAUSE_KEYS.includes(keyCode)) this.toggleStartStop()
+        if (SPEED_KYES.includes(keyCode)) this.tuneSpeed(keyCode)
+
+        if (ARROW_KEYS.includes(keyCode)) {
             const direction = keyCode.replace('Arrow', '')
             this.navigator.turn(direction)
         }
+
+        // direct set speed for development
         if (numberKeys.includes(keyCode)) {
             const speedIndex = keyCode.slice(-1)
-            this.changeSpeed(speedMap[speedIndex])
-        }
-        if (increaseDecreaseKeys.includes(keyCode)) {
-            this.tuneSpeed(keyCode)
+            const newSpeed = speedMap[speedIndex]
+            newSpeed && this.changeSpeed(speedMap[speedIndex])
         }
     }
 
     tuneSpeed(keyCode: string) {
-        let newSpeed = this.speed
-        const tuningStep = 50
-        if (keyCode.endsWith('Add')) {
-            newSpeed = this.speed - tuningStep < 0 ? 0 : this.speed - tuningStep
-        }
-        if (keyCode.endsWith('Subtract')) {
-            newSpeed = this.speed + tuningStep
-        }
-        this.changeSpeed(newSpeed)
+        if (INCREASE_KEYS.includes(keyCode)) this.speedUp()
+        if (DECREASE_KEYS.includes(keyCode)) this.speedDown()
+    }
+
+    private speedUp() {
+        const speed = this.speed - this.speedChangeStep < 0 ? 0 : this.speed - this.speedChangeStep
+        this.changeSpeed(speed)
+    }
+
+    private speedDown(): void {
+        const speed = this.speed + this.speedChangeStep
+        this.changeSpeed(speed)
     }
 
     toggleStartStop(): void {

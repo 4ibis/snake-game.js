@@ -7,9 +7,10 @@ export const DIRECTIONS = {
     left: 'left',
 }
 
-export const arrowsKeys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']
-
-export const increaseDecreaseKeys = ['NumpadSubtract', 'NumpadAdd']
+export const ARROW_KEYS = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']
+export const INCREASE_KEYS = ['NumpadAdd', 'Equal', 'BracketRight']
+export const DECREASE_KEYS = ['NumpadSubtract', 'Minus', 'BracketLeft']
+export const PLAY_PAUSE_KEYS = ['Space', 'KeyP']
 
 export const numberKeys = [
     'Numpad1',
