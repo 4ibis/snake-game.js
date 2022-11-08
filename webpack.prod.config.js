@@ -10,7 +10,7 @@ const public_dir = 'docs'
 
 module.exports = {
     mode: 'production',
-    entry: './index.js',
+    entry: './index.ts',
     output: {
         path: path.resolve(__dirname, public_dir),
         filename: bundle_name,
