@@ -1,16 +1,27 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { canvasID } from './src/constant'
+import { CANVAS_PARAMS, CONTROLS_SELECTORS, DASHBOARD_SELECTORS } from './src/constant'
 import Game from './src/game'
-import { Controls } from './src/types'
+import { Controls, DashboardView } from './src/types'
+import { setupCanvas } from './src/utils'
 
-const canvas = document.getElementById(canvasID)! as HTMLCanvasElement
-const speedView = document.querySelector('.current-speed')! as HTMLElement
+const select = (s: string): HTMLElement => document.querySelector(s)!
 
-const game = new Game(canvas!, speedView)
+const canvas = document.getElementById(CANVAS_PARAMS.id)! as HTMLCanvasElement
+setupCanvas(canvas, CANVAS_PARAMS.size)
+
+const game = new Game(canvas)
+
 const controls: Controls = {
-    speedUp: document.querySelector('.speed-up')!,
-    speedDown: document.querySelector('.speed-down')!,
+    speedUp: select(CONTROLS_SELECTORS.speedUp),
+    speedDown: select(CONTROLS_SELECTORS.speedDown),
 }
-game.initControls(controls)
+const dashboard: DashboardView = {
+    speed: select(DASHBOARD_SELECTORS.speed),
+    level: select(DASHBOARD_SELECTORS.level),
+    steps: select(DASHBOARD_SELECTORS.steps),
+    food: select(DASHBOARD_SELECTORS.food),
+}
+
+game.init(controls, dashboard)
 
 document.addEventListener('keydown', (event) => game.handleKeyInput(event))

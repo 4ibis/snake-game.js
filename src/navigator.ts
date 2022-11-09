@@ -8,7 +8,7 @@ class GameNavigator {
     private snake: Snake
     private field: Field
 
-    constructor(snake: Snake, field: Field) {
+    constructor(snake: Snake, field: Field, private onFoodInside: (foodCound: number) => void) {
         this.snake = snake
         this.field = field
     }
@@ -63,6 +63,8 @@ class GameNavigator {
         }
         if (this.isOnSamePosition(this.food.position, newHead)) {
             this.snake.isGrowing = true
+            this.snake.foodInside++
+            this.onFoodInside(this.snake.foodInside)
             this.putNewFoodOnField()
         }
         this.snake.setHead(newHead)

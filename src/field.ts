@@ -9,6 +9,7 @@ import {
 } from './types'
 
 export interface CanvasParams {
+    id: string
     size: Size
     cellSize: number
     gridColor: ColorString

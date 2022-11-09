@@ -1,4 +1,5 @@
 import { CanvasParams } from './field'
+import { Controls, DashboardView } from './types'
 
 export const DIRECTIONS = {
     up: 'up',
@@ -12,20 +13,7 @@ export const INCREASE_KEYS = ['NumpadAdd', 'Equal', 'BracketRight']
 export const DECREASE_KEYS = ['NumpadSubtract', 'Minus', 'BracketLeft']
 export const PLAY_PAUSE_KEYS = ['Space', 'KeyP']
 
-export const numberKeys = [
-    'Numpad1',
-    'Numpad2',
-    'Numpad3',
-    'Numpad4',
-    'Numpad5',
-    'Digit1',
-    'Digit2',
-    'Digit3',
-    'Digit4',
-    'Digit5',
-]
-
-export const speedMap = {
+export const SPEED_MAP = {
     '1': 1000,
     '2': 750,
     '3': 500,
@@ -36,11 +24,22 @@ export const speedMap = {
 const width = 401
 const height = 401
 
-export const canvasID = 'canvas'
-
 export const CANVAS_PARAMS: CanvasParams = {
+    id: 'canvas',
     size: [width, height],
     cellSize: 20,
     gridColor: '#000000',
     bgColor: '#ffffff', // '#dadada',
+}
+
+export const DASHBOARD_SELECTORS: Record<keyof DashboardView, string> = {
+    speed: '.current-speed',
+    level: '.level-view',
+    steps: '.steps-view',
+    food: '.debug .food-view',
+}
+
+export const CONTROLS_SELECTORS: Record<keyof Controls, string> = {
+    speedUp: '.speed-up',
+    speedDown: '.speed-down',
 }

@@ -6,6 +6,7 @@ class Snake implements BaseFieldFigure {
     isGrowing: boolean = false
     direction: string = DIRECTIONS.up
     color: ColorString = 'green'
+    foodInside: number = 0
 
     constructor(body: Cell[]) {
         this.body = body
