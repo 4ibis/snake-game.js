@@ -305,7 +305,6 @@ const pickerColors = document.querySelector('.picker-colors');
 (0,_share_utils__WEBPACK_IMPORTED_MODULE_1__.setupPicker)(pickerColors);
 const game = new _PixelGame__WEBPACK_IMPORTED_MODULE_2__["default"](canvas);
 canvas.addEventListener('click', (event) => game.handleClick(event));
-const imagesContainer = document.querySelector('.images');
 document.querySelector('.btn.save').addEventListener('click', () => game.saveImage());
 const chooseColor = document.querySelector('.picker-colors');
 chooseColor.addEventListener('click', (event) => game.chooseColor(event));

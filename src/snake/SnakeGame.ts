@@ -1,17 +1,12 @@
-import {
-    ARROW_KEYS,
-    CANVAS_PARAMS,
-    DECREASE_KEYS,
-    INCREASE_KEYS,
-    PLAY_PAUSE_KEYS,
-} from './constant'
+import { ARROW_KEYS, DECREASE_KEYS, INCREASE_KEYS, PLAY_PAUSE_KEYS } from './constant'
 import { Controls, DashboardView } from './types'
-import Field from './field'
+import Field from '../share/field'
 import Snake from './snake'
 import GameNavigator from './navigator'
 import GameState from './state'
 import Dashboard from './dashboard'
-import { getSnakeBody } from './utils'
+import { getSnakeBody } from '../share/utils'
+import { CANVAS_PARAMS } from '../share/constant'
 
 class Game {
     private intervalID: number

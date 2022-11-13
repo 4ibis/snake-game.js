@@ -1,4 +1,5 @@
-import { BaseFieldFigure, Cell, ColorString } from './types'
+import { Cell } from '../share/types'
+import { BaseFieldFigure, ColorString } from './types'
 
 class Food implements BaseFieldFigure {
     body: Cell[]

@@ -1,22 +1,15 @@
 import {
     BaseFieldFigure,
-    Cell,
     ColorString,
     Coordinates,
     Pixel,
     RenderingParams,
     Size,
-} from './types'
+} from '../snake/types'
 
-export interface CanvasParams {
-    id: string
-    size: Size
-    cellSize: number
-    gridColor: ColorString
-    bgColor: ColorString
-}
+import { CanvasParams, Cell } from '../share/types'
 
-class Field {
+export default class Field {
     width: Pixel
     height: Pixel
     cellSize: number
@@ -37,6 +30,12 @@ class Field {
         this.drawGrid()
     }
 
+    pickColor([x, y]: Cell): Uint8ClampedArray {
+        const image = this.context.getImageData(x, y, 1, 1)
+        console.log('image', image)
+        return image.data
+    }
+
     private fillBackground(color: string): void {
         this.context.fillStyle = color
         this.context.fillRect(0, 0, this.height, this.width)
@@ -51,6 +50,12 @@ class Field {
     private initBoundaries() {
         this.maxXCell = Math.floor((this.width - this.cellSize) / this.cellSize)
         this.maxYCell = Math.floor((this.height - this.cellSize) / this.cellSize)
+    }
+
+    getCellFromPixels([clickX, clickY]: Coordinates): Cell {
+        const cellX = Math.floor(clickX / this.cellSize)
+        const cellY = Math.floor(clickY / this.cellSize)
+        return [cellX, cellY]
     }
 
     getCoordinates(cell: Cell): Coordinates {
@@ -74,6 +79,7 @@ class Field {
     drawFigure(figure: BaseFieldFigure) {
         figure.body.forEach((cell) => this.drawCell(cell, figure.color))
         this.drawGrid()
+        this.context.save()
     }
 
     private drawLine(startPoint: Cell, endPoint: Cell) {
@@ -87,9 +93,6 @@ class Field {
             this.drawLine([i, 1], [i, this.height])
             this.drawLine([1, i], [this.width, i])
         }
-        this.context.strokeStyle = this.gridColor
         this.context.stroke()
     }
 }
-
-export default Field

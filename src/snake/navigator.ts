@@ -1,6 +1,6 @@
-import { Cell } from './types'
+import { Cell } from '../share/types'
 import Snake from './snake'
-import Field from './field'
+import Field from '../share/field'
 import Food from './food'
 
 class GameNavigator {

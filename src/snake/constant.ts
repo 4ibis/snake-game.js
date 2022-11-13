@@ -1,4 +1,3 @@
-import { CanvasParams } from './field'
 import { Controls, DashboardView } from './types'
 
 export const DIRECTIONS = {
@@ -19,17 +18,6 @@ export const SPEED_MAP = {
     '3': 500,
     '4': 250,
     '5': 100,
-}
-
-const width = 401
-const height = 401
-
-export const CANVAS_PARAMS: CanvasParams = {
-    id: 'canvas',
-    size: [width, height],
-    cellSize: 20,
-    gridColor: '#000000',
-    bgColor: '#ffffff', // '#dadada',
 }
 
 export const DASHBOARD_SELECTORS: Record<keyof DashboardView, string> = {

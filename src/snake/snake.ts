@@ -1,5 +1,6 @@
+import { Cell } from '../share/types'
 import { DIRECTIONS } from './constant'
-import { BaseFieldFigure, Cell, ColorString, FigureBody } from './types'
+import { BaseFieldFigure, ColorString, FigureBody } from './types'
 
 class Snake implements BaseFieldFigure {
     body: FigureBody

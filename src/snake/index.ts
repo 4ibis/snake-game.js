@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { CANVAS_PARAMS, CONTROLS_SELECTORS, DASHBOARD_SELECTORS } from './src/constant'
-import Game from './src/game'
-import { Controls, DashboardView } from './src/types'
-import { setupCanvas } from './src/utils'
+import { CONTROLS_SELECTORS, DASHBOARD_SELECTORS } from './constant'
+import Game from './SnakeGame'
+import { Controls, DashboardView } from './types'
+import { setupCanvas } from '../share/utils'
+import { CANVAS_PARAMS } from '../share/constant'
 
 const select = (s: string): HTMLElement => document.querySelector(s)!
 
