@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+    background-color: #dadada;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+canvas {
+    /* margin: 0 auto; */
+    display: flex;
+    justify-content: center;
+    background-color: white;
+
+}
