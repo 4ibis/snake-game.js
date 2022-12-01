@@ -94,7 +94,7 @@ class Field {
         this.maxXCell = Math.floor((this.width - this.cellSize) / this.cellSize);
         this.maxYCell = Math.floor((this.height - this.cellSize) / this.cellSize);
     }
-    getCellFromPixels([clickX, clickY]) {
+    getCellCoordsFromPixels([clickX, clickY]) {
         const cellX = Math.floor(clickX / this.cellSize);
         const cellY = Math.floor(clickY / this.cellSize);
         return [cellX, cellY];
@@ -107,15 +107,20 @@ class Field {
         const coordinates = this.getCoordinates(cell);
         this.context.clearRect(...coordinates, this.cellSize, this.cellSize);
     }
-    drawCell(cell, color) {
-        const coordinates = this.getCoordinates(cell);
+    drawCell(cell) {
+        const coordinates = this.getCoordinates(cell.coords);
         const size = [this.cellSize, this.cellSize];
-        const params = [...coordinates, ...size];
-        this.context.fillStyle = color;
-        this.context.fillRect(...params);
+        this.context.fillStyle = cell.color;
+        this.context.fillRect(...coordinates, ...size);
     }
     drawFigure(figure) {
-        figure.body.forEach((cell) => this.drawCell(cell, figure.color));
+        const b = figure.body;
+        const lastIndex = b.length - 1;
+        // draw from end to start
+        for (let i = lastIndex; i >= 0; i--) {
+            console.log(i);
+            this.drawCell(b[i]);
+        }
         this.drawGrid();
         this.context.save();
     }
@@ -150,6 +155,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "setupPicker": () => (/* binding */ setupPicker)
 /* harmony export */ });
 /* harmony import */ var _pixel_constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../pixel/constant */ "./src/pixel/constant.ts");
+/* harmony import */ var _snake_constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../snake/constant */ "./src/snake/constant.ts");
+
 
 const setupCanvas = (canvasElement, size) => {
     const [width, height] = size;
@@ -159,8 +166,9 @@ const setupCanvas = (canvasElement, size) => {
 const getSnakeBody = () => {
     //todo: generate snake's body at the field's center
     return [
-        [10, 12],
-        [10, 13],
+        { coords: [6, 5], color: _snake_constant__WEBPACK_IMPORTED_MODULE_1__.SNAKE_COLORS.head },
+        { coords: [6, 6], color: _snake_constant__WEBPACK_IMPORTED_MODULE_1__.SNAKE_COLORS.body },
+        { coords: [6, 7], color: _snake_constant__WEBPACK_IMPORTED_MODULE_1__.SNAKE_COLORS.body },
     ];
 };
 const arrayToRGB = (arr) => {
@@ -291,8 +299,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DASHBOARD_SELECTORS": () => (/* binding */ DASHBOARD_SELECTORS),
 /* harmony export */   "DECREASE_KEYS": () => (/* binding */ DECREASE_KEYS),
 /* harmony export */   "DIRECTIONS": () => (/* binding */ DIRECTIONS),
+/* harmony export */   "FOOD_COLOR": () => (/* binding */ FOOD_COLOR),
 /* harmony export */   "INCREASE_KEYS": () => (/* binding */ INCREASE_KEYS),
 /* harmony export */   "PLAY_PAUSE_KEYS": () => (/* binding */ PLAY_PAUSE_KEYS),
+/* harmony export */   "SNAKE_COLORS": () => (/* binding */ SNAKE_COLORS),
 /* harmony export */   "SPEED_MAP": () => (/* binding */ SPEED_MAP)
 /* harmony export */ });
 const DIRECTIONS = {
@@ -301,6 +311,11 @@ const DIRECTIONS = {
     down: 'down',
     left: 'left',
 };
+const SNAKE_COLORS = {
+    head: 'black',
+    body: 'green',
+};
+const FOOD_COLOR = 'red';
 const ARROW_KEYS = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'];
 const INCREASE_KEYS = ['NumpadAdd', 'Equal', 'BracketRight'];
 const DECREASE_KEYS = ['NumpadSubtract', 'Minus', 'BracketLeft'];
@@ -371,13 +386,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 class Food {
     constructor(foodCell) {
-        this.color = 'red';
+        this.colorBody = 'red';
         this.body = [foodCell];
     }
     get position() {
-        return this.body[0];
+        return this.body[0].coords;
     }
-    set position(cell) {
+    set position(coords) {
+        const cell = { coords, color: this.colorBody };
         this.body = [cell];
     }
 }
@@ -397,6 +413,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _food__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./food */ "./src/snake/food.ts");
+/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant */ "./src/snake/constant.ts");
+
 
 class GameNavigator {
     constructor(snake, field, onFoodInside) {
@@ -412,14 +430,14 @@ class GameNavigator {
         this.field.drawGrid();
     }
     getNewFood() {
-        let cell;
+        let coords;
         do {
-            cell = this.createRandomCell();
-        } while (this.isCellUnderSnake(cell));
-        return new _food__WEBPACK_IMPORTED_MODULE_0__["default"](cell);
+            coords = this.createRandomCell();
+        } while (this.isCellUnderSnake(coords));
+        return new _food__WEBPACK_IMPORTED_MODULE_0__["default"]({ coords, color: _constant__WEBPACK_IMPORTED_MODULE_1__.FOOD_COLOR });
     }
     isCellUnderSnake(cell) {
-        const check = (cellOfSnake) => this.isOnSamePosition(cell, cellOfSnake);
+        const check = (cellOfSnake) => this.isOnSamePosition(cell, cellOfSnake.coords);
         return this.snake.body.some(check);
     }
     getRandomNumber(min, max) {
@@ -440,21 +458,21 @@ class GameNavigator {
         this.moveTail();
     }
     moveHeadForward() {
-        const newHead = this.getNextCell(this.snake.getHead(), this.snake.direction);
-        if (this.field.isOutOfCanvas(newHead)) {
-            this.correctPosition(newHead);
+        const newHeadCoords = this.getNextCellCoords(this.snake.getHead().coords, this.snake.direction);
+        if (this.field.isOutOfCanvas(newHeadCoords)) {
+            this.correctPosition(newHeadCoords);
         }
-        if (this.isOnSamePosition(this.food.position, newHead)) {
+        if (this.isOnSamePosition(this.food.position, newHeadCoords)) {
             this.snake.isGrowing = true;
             this.snake.foodInside++;
             this.onFoodInside(this.snake.foodInside);
             this.putNewFoodOnField();
         }
-        this.snake.setHead(newHead);
+        this.snake.setHead(newHeadCoords);
     }
     moveTail() {
         if (!this.snake.isGrowing) {
-            this.field.clean(this.snake.popTail());
+            this.field.clean(this.snake.popTail().coords);
         }
         this.snake.isGrowing = false;
     }
@@ -481,7 +499,7 @@ class GameNavigator {
         const [b_x, b_y] = cellB;
         return a_x === b_x && a_y === b_y;
     }
-    getNextCell(cell, direction) {
+    getNextCellCoords(cell, direction) {
         let [x, y] = cell;
         let newHead = null;
         switch (direction) {
@@ -527,15 +545,18 @@ class Snake {
     constructor(body) {
         this.isGrowing = false;
         this.direction = _constant__WEBPACK_IMPORTED_MODULE_0__.DIRECTIONS.up;
-        this.color = 'green';
+        this.colorBody = _constant__WEBPACK_IMPORTED_MODULE_0__.SNAKE_COLORS.body;
+        this.colorHead = _constant__WEBPACK_IMPORTED_MODULE_0__.SNAKE_COLORS.head;
         this.foodInside = 0;
         this.body = body;
     }
     getHead() {
         return this.body[0];
     }
-    setHead(head) {
+    setHead(coords) {
+        const head = { coords, color: this.colorHead };
         this.body.unshift(head);
+        this.body[1].color = this.colorBody;
     }
     popTail() {
         return this.body.pop();

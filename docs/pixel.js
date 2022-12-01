@@ -24,13 +24,13 @@ class PixelGame {
     }
     clickToCell(event) {
         const clickCoordinates = [event.offsetX, event.offsetY];
-        const cell = this.field.getCellFromPixels(clickCoordinates);
+        const cell = this.field.getCellCoordsFromPixels(clickCoordinates);
         return cell;
     }
     handleClick(event) {
         const color = event.shiftKey ? _share_constant__WEBPACK_IMPORTED_MODULE_0__.CANVAS_PARAMS.bgColor : this.currentColor;
         const cell = this.clickToCell(event);
-        this.field.drawFigure({ body: [cell], color });
+        this.field.drawFigure({ body: [{ coords: cell, color }], colorBody: color });
     }
     chooseColor(event) {
         this.currentColor = event.target.dataset.color;
@@ -144,7 +144,7 @@ class Field {
         this.maxXCell = Math.floor((this.width - this.cellSize) / this.cellSize);
         this.maxYCell = Math.floor((this.height - this.cellSize) / this.cellSize);
     }
-    getCellFromPixels([clickX, clickY]) {
+    getCellCoordsFromPixels([clickX, clickY]) {
         const cellX = Math.floor(clickX / this.cellSize);
         const cellY = Math.floor(clickY / this.cellSize);
         return [cellX, cellY];
@@ -157,15 +157,20 @@ class Field {
         const coordinates = this.getCoordinates(cell);
         this.context.clearRect(...coordinates, this.cellSize, this.cellSize);
     }
-    drawCell(cell, color) {
-        const coordinates = this.getCoordinates(cell);
+    drawCell(cell) {
+        const coordinates = this.getCoordinates(cell.coords);
         const size = [this.cellSize, this.cellSize];
-        const params = [...coordinates, ...size];
-        this.context.fillStyle = color;
-        this.context.fillRect(...params);
+        this.context.fillStyle = cell.color;
+        this.context.fillRect(...coordinates, ...size);
     }
     drawFigure(figure) {
-        figure.body.forEach((cell) => this.drawCell(cell, figure.color));
+        const b = figure.body;
+        const lastIndex = b.length - 1;
+        // draw from end to start
+        for (let i = lastIndex; i >= 0; i--) {
+            console.log(i);
+            this.drawCell(b[i]);
+        }
         this.drawGrid();
         this.context.save();
     }
@@ -200,6 +205,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "setupPicker": () => (/* binding */ setupPicker)
 /* harmony export */ });
 /* harmony import */ var _pixel_constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../pixel/constant */ "./src/pixel/constant.ts");
+/* harmony import */ var _snake_constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../snake/constant */ "./src/snake/constant.ts");
+
 
 const setupCanvas = (canvasElement, size) => {
     const [width, height] = size;
@@ -209,8 +216,9 @@ const setupCanvas = (canvasElement, size) => {
 const getSnakeBody = () => {
     //todo: generate snake's body at the field's center
     return [
-        [10, 12],
-        [10, 13],
+        { coords: [6, 5], color: _snake_constant__WEBPACK_IMPORTED_MODULE_1__.SNAKE_COLORS.head },
+        { coords: [6, 6], color: _snake_constant__WEBPACK_IMPORTED_MODULE_1__.SNAKE_COLORS.body },
+        { coords: [6, 7], color: _snake_constant__WEBPACK_IMPORTED_MODULE_1__.SNAKE_COLORS.body },
     ];
 };
 const arrayToRGB = (arr) => {
@@ -224,6 +232,61 @@ const setupPicker = (colorsContainer) => {
         li.style.backgroundColor = color;
         colorsContainer.insertAdjacentElement('beforeend', li);
     }
+};
+
+
+/***/ }),
+
+/***/ "./src/snake/constant.ts":
+/*!*******************************!*\
+  !*** ./src/snake/constant.ts ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ARROW_KEYS": () => (/* binding */ ARROW_KEYS),
+/* harmony export */   "CONTROLS_SELECTORS": () => (/* binding */ CONTROLS_SELECTORS),
+/* harmony export */   "DASHBOARD_SELECTORS": () => (/* binding */ DASHBOARD_SELECTORS),
+/* harmony export */   "DECREASE_KEYS": () => (/* binding */ DECREASE_KEYS),
+/* harmony export */   "DIRECTIONS": () => (/* binding */ DIRECTIONS),
+/* harmony export */   "FOOD_COLOR": () => (/* binding */ FOOD_COLOR),
+/* harmony export */   "INCREASE_KEYS": () => (/* binding */ INCREASE_KEYS),
+/* harmony export */   "PLAY_PAUSE_KEYS": () => (/* binding */ PLAY_PAUSE_KEYS),
+/* harmony export */   "SNAKE_COLORS": () => (/* binding */ SNAKE_COLORS),
+/* harmony export */   "SPEED_MAP": () => (/* binding */ SPEED_MAP)
+/* harmony export */ });
+const DIRECTIONS = {
+    up: 'up',
+    right: 'right',
+    down: 'down',
+    left: 'left',
+};
+const SNAKE_COLORS = {
+    head: 'black',
+    body: 'green',
+};
+const FOOD_COLOR = 'red';
+const ARROW_KEYS = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'];
+const INCREASE_KEYS = ['NumpadAdd', 'Equal', 'BracketRight'];
+const DECREASE_KEYS = ['NumpadSubtract', 'Minus', 'BracketLeft'];
+const PLAY_PAUSE_KEYS = ['Space', 'KeyP'];
+const SPEED_MAP = {
+    '1': 1000,
+    '2': 750,
+    '3': 500,
+    '4': 250,
+    '5': 100,
+};
+const DASHBOARD_SELECTORS = {
+    speed: '.current-speed',
+    level: '.level-view',
+    steps: '.steps-view',
+    food: '.debug .food-view',
+};
+const CONTROLS_SELECTORS = {
+    speedUp: '.speed-up',
+    speedDown: '.speed-down',
 };
 
 
