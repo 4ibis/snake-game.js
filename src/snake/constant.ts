@@ -7,6 +7,13 @@ export const DIRECTIONS = {
     left: 'left',
 }
 
+export const SNAKE_COLORS = {
+    head: 'black',
+    body: 'green',
+}
+
+export const FOOD_COLOR = 'red'
+
 export const ARROW_KEYS = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']
 export const INCREASE_KEYS = ['NumpadAdd', 'Equal', 'BracketRight']
 export const DECREASE_KEYS = ['NumpadSubtract', 'Minus', 'BracketLeft']

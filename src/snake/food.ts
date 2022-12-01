@@ -1,19 +1,20 @@
-import { Cell } from '../share/types'
+import { Cell, CellCoords } from '../share/types'
 import { BaseFieldFigure, ColorString } from './types'
 
 class Food implements BaseFieldFigure {
     body: Cell[]
-    color: ColorString = 'red'
+    colorBody: ColorString = 'red'
 
     constructor(foodCell: Cell) {
         this.body = [foodCell]
     }
 
-    get position(): Cell {
-        return this.body[0]
+    get position(): CellCoords {
+        return this.body[0].coords
     }
 
-    set position(cell: Cell) {
+    set position(coords: CellCoords) {
+        const cell: Cell = { coords, color: this.colorBody }
         this.body = [cell]
     }
 }

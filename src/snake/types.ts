@@ -11,13 +11,11 @@ export type Width = number
 export type Height = number
 export type Size = [Width, Height]
 
-export type RenderingParams = [X, Y, Width, Height]
-
 export type FigureBody = Cell[]
 
 export interface BaseFieldFigure {
     body: FigureBody
-    color: ColorString
+    colorBody: ColorString
 }
 
 export type Controls<T = HTMLElement> = {

@@ -8,4 +8,9 @@ export interface CanvasParams {
 
 export type colorAsArr = [number, number, number, number]
 
-export type Cell = [number, number]
+export type CellCoords = [number, number]
+
+export type Cell = {
+    coords: CellCoords
+    color: string
+}

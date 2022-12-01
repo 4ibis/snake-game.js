@@ -1,7 +1,7 @@
 import { CANVAS_PARAMS } from '../share/constant'
 import { Coordinates } from '../snake/types'
 import Field from '../share/field'
-import { Cell } from '../share/types'
+import { CellCoords } from '../share/types'
 
 export default class PixelGame {
     field: Field
@@ -11,16 +11,16 @@ export default class PixelGame {
         this.field = new Field(canvas.getContext('2d', { willReadFrequently: true }), CANVAS_PARAMS)
     }
 
-    private clickToCell(event: MouseEvent): Cell {
+    private clickToCell(event: MouseEvent): CellCoords {
         const clickCoordinates: Coordinates = [event.offsetX, event.offsetY]
-        const cell = this.field.getCellFromPixels(clickCoordinates)
+        const cell = this.field.getCellCoordsFromPixels(clickCoordinates)
         return cell
     }
 
     handleClick(event: MouseEvent): void {
         const color = event.shiftKey ? CANVAS_PARAMS.bgColor : this.currentColor
         const cell = this.clickToCell(event)
-        this.field.drawFigure({ body: [cell], color })
+        this.field.drawFigure({ body: [{ coords: cell, color }], colorBody: color })
     }
 
     chooseColor(event: MouseEvent) {

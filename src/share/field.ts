@@ -1,13 +1,6 @@
-import {
-    BaseFieldFigure,
-    ColorString,
-    Coordinates,
-    Pixel,
-    RenderingParams,
-    Size,
-} from '../snake/types'
+import { BaseFieldFigure, Coordinates, Pixel, Size } from '../snake/types'
 
-import { CanvasParams, Cell } from '../share/types'
+import { CanvasParams, Cell, CellCoords } from '../share/types'
 
 export default class Field {
     width: Pixel
@@ -30,7 +23,7 @@ export default class Field {
         this.drawGrid()
     }
 
-    pickColor([x, y]: Cell): Uint8ClampedArray {
+    pickColor([x, y]: CellCoords): Uint8ClampedArray {
         const image = this.context.getImageData(x, y, 1, 1)
         console.log('image', image)
         return image.data
@@ -41,7 +34,7 @@ export default class Field {
         this.context.fillRect(0, 0, this.height, this.width)
     }
 
-    public isOutOfCanvas([x, y]: Cell): boolean {
+    public isOutOfCanvas([x, y]: CellCoords): boolean {
         const xIsOut = x < 0 || x > this.maxXCell
         const yIsOut = y < 0 || y > this.maxYCell
         return xIsOut || yIsOut
@@ -52,37 +45,42 @@ export default class Field {
         this.maxYCell = Math.floor((this.height - this.cellSize) / this.cellSize)
     }
 
-    getCellFromPixels([clickX, clickY]: Coordinates): Cell {
+    getCellCoordsFromPixels([clickX, clickY]: Coordinates): CellCoords {
         const cellX = Math.floor(clickX / this.cellSize)
         const cellY = Math.floor(clickY / this.cellSize)
         return [cellX, cellY]
     }
 
-    getCoordinates(cell: Cell): Coordinates {
+    getCoordinates(cell: CellCoords): Coordinates {
         const [x, y] = cell
         return [x * this.cellSize, y * this.cellSize] as Coordinates
     }
 
-    clean(cell: Cell) {
+    clean(cell: CellCoords) {
         const coordinates = this.getCoordinates(cell)
         this.context.clearRect(...coordinates, this.cellSize, this.cellSize)
     }
 
-    private drawCell(cell: Cell, color: ColorString) {
-        const coordinates = this.getCoordinates(cell)
+    private drawCell(cell: Cell) {
+        const coordinates = this.getCoordinates(cell.coords)
         const size: Size = [this.cellSize, this.cellSize]
-        const params: RenderingParams = [...coordinates, ...size]
-        this.context.fillStyle = color
-        this.context.fillRect(...params)
+        this.context.fillStyle = cell.color
+        this.context.fillRect(...coordinates, ...size)
     }
 
     drawFigure(figure: BaseFieldFigure) {
-        figure.body.forEach((cell) => this.drawCell(cell, figure.color))
+        const b = figure.body
+        const lastIndex = b.length - 1
+        // draw from end to start
+        for (let i = lastIndex; i >= 0; i--) {
+            console.log(i)
+            this.drawCell(b[i])
+        }
         this.drawGrid()
         this.context.save()
     }
 
-    private drawLine(startPoint: Cell, endPoint: Cell) {
+    private drawLine(startPoint: CellCoords, endPoint: CellCoords) {
         this.context.moveTo(...startPoint)
         this.context.lineTo(...endPoint)
     }

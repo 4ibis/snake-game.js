@@ -1,4 +1,5 @@
 import { PICKER_COLORS } from '../pixel/constant'
+import { SNAKE_COLORS } from '../snake/constant'
 import { FigureBody, Size } from '../snake/types'
 
 export const setupCanvas = (canvasElement: HTMLCanvasElement, size: Size): void => {
@@ -10,8 +11,9 @@ export const setupCanvas = (canvasElement: HTMLCanvasElement, size: Size): void 
 export const getSnakeBody = (): FigureBody => {
     //todo: generate snake's body at the field's center
     return [
-        [10, 12],
-        [10, 13],
+        { coords: [6, 5], color: SNAKE_COLORS.head },
+        { coords: [6, 6], color: SNAKE_COLORS.body },
+        { coords: [6, 7], color: SNAKE_COLORS.body },
     ]
 }
 export const arrayToRGB = (arr: Uint8ClampedArray): string => {

@@ -1,12 +1,13 @@
-import { Cell } from '../share/types'
-import { DIRECTIONS } from './constant'
+import { Cell, CellCoords } from '../share/types'
+import { DIRECTIONS, SNAKE_COLORS } from './constant'
 import { BaseFieldFigure, ColorString, FigureBody } from './types'
 
 class Snake implements BaseFieldFigure {
     body: FigureBody
     isGrowing: boolean = false
     direction: string = DIRECTIONS.up
-    color: ColorString = 'green'
+    colorBody: ColorString = SNAKE_COLORS.body
+    colorHead: ColorString = SNAKE_COLORS.head
     foodInside: number = 0
 
     constructor(body: Cell[]) {
@@ -17,8 +18,10 @@ class Snake implements BaseFieldFigure {
         return this.body[0]
     }
 
-    setHead(head: Cell) {
+    setHead(coords: CellCoords) {
+        const head = { coords, color: this.colorHead }
         this.body.unshift(head)
+        this.body[1].color = this.colorBody
     }
 
     popTail(): Cell {
