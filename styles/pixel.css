@@ -18,12 +18,6 @@
     justify-content: center;
 }
 
-.canvas-container {
-    /* flex-grow: 1; */
-    display: flex;
-    justify-content: center;
-}
-
 .picker {
     display: flex;
     flex-direction: column;

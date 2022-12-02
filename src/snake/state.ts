@@ -1,3 +1,4 @@
+import { EVENT, EventEmitter } from '../share/event'
 import { State } from './types'
 
 export default class GameState {
@@ -7,9 +8,13 @@ export default class GameState {
     private speedStep: number = 25
     private foodCount: number = 0
 
+    constructor(private events: EventEmitter) {
+        this.events.on(EVENT.onEat, (foodCount: number) => this.setFoodCount(foodCount))
+    }
+
     updateDashboard: (state: State) => void
 
-    getState(): State {
+    get state(): State {
         return {
             level: this._level,
             steps: this._steps,
@@ -18,19 +23,13 @@ export default class GameState {
         }
     }
 
-    foodEaten(foodCount: number): void {
+    private setFoodCount(foodCount: number): void {
         this.foodCount = foodCount
-        this.updateDashboard(this.getState())
     }
 
     levelUp() {
         this._level++
-        this.updateDashboard(this.getState())
-    }
-
-    stepsUp() {
-        this._steps++
-        this.updateDashboard(this.getState())
+        this.events.emit(EVENT.onLevelUp, this._level)
     }
 
     get speed() {
@@ -40,11 +39,11 @@ export default class GameState {
     public speedUp() {
         const newSpeed = this._speed - this.speedStep
         this._speed = newSpeed < 0 ? 0 : newSpeed
-        this.updateDashboard(this.getState())
+        this.events.emit(EVENT.onSpeedChange, this.speed)
     }
 
     public speedDown(): void {
         this._speed = this._speed + this.speedStep
-        this.updateDashboard(this.getState())
+        this.events.emit(EVENT.onSpeedChange, this.speed)
     }
 }

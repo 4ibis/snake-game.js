@@ -7,35 +7,34 @@ import GameState from './state'
 import Dashboard from './dashboard'
 import { getSnakeBody } from '../share/utils'
 import { CANVAS_PARAMS } from '../share/constant'
+import { EVENT, EventEmitter } from '../share/event'
 
 class Game {
+    private events: EventEmitter
     private intervalID: number
     public navigator: GameNavigator
     private isRunning: boolean = false
     private dashboard: Dashboard
-    private state: GameState = new GameState()
-    private isOver: boolean = false
+    private state: GameState
+    private gameOver: boolean = false
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, dashboardView: DashboardView, controls: Controls) {
+        this.events = new EventEmitter()
         const snake = new Snake(getSnakeBody())
         const field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
-        const callbacks = {
-            onEat: (foodCount: number) => this.state.foodEaten(foodCount),
-            onDie: () => {
-                this.gameOver()
-                console.log('dead!')
-            },
-        }
-
-        this.navigator = new GameNavigator(snake, field, callbacks)
-        this.navigator.drawSnake()
-        this.navigator.putNewFoodOnField()
+        this.navigator = new GameNavigator(snake, field, this.events)
+        this.registerEvents()
+        this.dashboard = new Dashboard(dashboardView, this.events)
+        this.state = new GameState(this.events)
+        this.state.updateDashboard = this.dashboard.update.bind(this.dashboard)
+        this.initControls(controls)
     }
 
-    init(controls: Controls, dashboard: DashboardView) {
-        this.dashboard = new Dashboard(dashboard, this.state.getState.bind(this.state))
-        this.state.updateDashboard = this.dashboard.update.bind(this.dashboard)
-        this.dashboard.update()
+    private registerEvents() {
+        this.events.on(EVENT.onDie, () => this.finish())
+    }
+
+    initControls(controls: Controls) {
         controls.speedUp.addEventListener('click', () => this.state.speedUp())
         controls.speedDown.addEventListener('click', () => this.state.speedDown())
     }
@@ -79,23 +78,29 @@ class Game {
 
     loop(): void {
         this.navigator.move()
-        this.navigator.reDraw()
-        this.state.stepsUp()
-        // this.dashboard.update()
+        if (!this.gameOver) {
+            this.navigator.reDraw()
+        }
+        this.events.emit(EVENT.onStateUpdate, this.state.state)
     }
 
     start(gameSpeed: number = this.state.speed): void {
-        if (this.isOver) {
+        if (this.gameOver) {
             return
         }
         this.stop()
+        this.loop() // todo: better chane speed algorithm
         this.intervalID = window.setInterval(() => this.loop(), gameSpeed)
         this.isRunning = true
     }
 
-    gameOver(): void {
+    finish(): void {
+        console.info('Game is Over')
         this.stop()
-        this.isOver = true
+        this.gameOver = true
+        // todo: show game over popup
+        alert('GAME OVER')
+        location.reload()
     }
 
     stop(): void {

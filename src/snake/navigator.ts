@@ -3,20 +3,14 @@ import Snake from './snake'
 import Field from '../share/field'
 import Food from './food'
 import { FOOD_COLOR } from './constant'
-import { Callbacks } from './types'
+import { EVENT, EventEmitter } from '../share/event'
 
 class GameNavigator {
     private food: Food
-    private snake: Snake
-    private field: Field
-    private onEat: Callbacks['onEat']
-    private onDie: Callbacks['onDie']
 
-    constructor(snake: Snake, field: Field, callbacks: Callbacks) {
-        this.onEat = callbacks.onEat
-        this.onDie = callbacks.onDie
-        this.snake = snake
-        this.field = field
+    constructor(private snake: Snake, private field: Field, private events: EventEmitter) {
+        this.drawSnake()
+        this.putNewFoodOnField()
     }
 
     reDraw() {
@@ -57,28 +51,28 @@ class GameNavigator {
         this.field.drawFigure(this.food)
     }
 
-    move(): void {
-        this.moveHeadForward()
-        this.moveTail()
-    }
-
-    moveHeadForward(): void {
-        const newHeadCoords: CellCoords = this.getNextCellCoords(
+    move() {
+        const newHeadCoords = this.getNextCellCoords(
             this.snake.getHead().coords,
             this.snake.direction
         )
+        if (this.isCellUnderSnake(newHeadCoords)) {
+            this.events.emit(EVENT.onDie)
+            return
+        }
+        this.moveHeadForward(newHeadCoords)
+        this.moveTail()
+    }
+
+    moveHeadForward(newHeadCoords: CellCoords) {
         if (this.field.isOutOfCanvas(newHeadCoords)) {
             this.correctPosition(newHeadCoords)
         }
-        if (this.isCellUnderSnake(newHeadCoords)) {
-            this.onDie()
-        }
-
         // eat food
         if (this.isOnSamePosition(this.food.position, newHeadCoords)) {
             this.snake.isGrowing = true
             this.snake.foodInside++
-            this.onEat(this.snake.foodInside)
+            this.events.emit(EVENT.onEat, this.snake.foodInside)
             this.putNewFoodOnField()
         }
         this.snake.setHead(newHeadCoords)

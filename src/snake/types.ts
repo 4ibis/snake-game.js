@@ -18,16 +18,16 @@ export interface BaseFieldFigure {
     colorBody: ColorString
 }
 
-export type Controls<T = HTMLElement> = {
-    speedUp: T
-    speedDown: T
+export type Controls = {
+    speedUp: HTMLElement
+    speedDown: HTMLElement
 }
 
-export type DashboardView<T = HTMLElement> = {
-    speed: T
-    level: T
-    steps: T
-    food: T
+export type DashboardView = {
+    speed: HTMLElement
+    level: HTMLElement
+    steps: HTMLElement
+    food: HTMLElement
 }
 
 export type State = {

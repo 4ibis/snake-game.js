@@ -9,5 +9,5 @@ export const CANVAS_PARAMS: CanvasParams = {
     cellSize: 40,
     gridColor: '#000000',
     // todo: choose bg color
-    bgColor: '#ffffff',
+    bgColor: '#dadada',
 }

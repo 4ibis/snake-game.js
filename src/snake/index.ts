@@ -10,8 +10,6 @@ const select = (s: string): HTMLElement => document.querySelector(s)!
 const canvas = document.getElementById(CANVAS_PARAMS.id)! as HTMLCanvasElement
 setupCanvas(canvas, CANVAS_PARAMS.size)
 
-const game = new Game(canvas)
-
 const controls: Controls = {
     speedUp: select(CONTROLS_SELECTORS.speedUp),
     speedDown: select(CONTROLS_SELECTORS.speedDown),
@@ -23,6 +21,6 @@ const dashboard: DashboardView = {
     food: select(DASHBOARD_SELECTORS.food),
 }
 
-game.init(controls, dashboard)
+const game = new Game(canvas, dashboard, controls)
 
 document.addEventListener('keydown', (event) => game.handleKeyInput(event))

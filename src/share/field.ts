@@ -24,8 +24,9 @@ export default class Field {
     }
 
     pickColor([x, y]: CellCoords): Uint8ClampedArray {
+        // todo: separate field classes for snake and pixel
+
         const image = this.context.getImageData(x, y, 1, 1)
-        console.log('image', image)
         return image.data
     }
 
@@ -73,7 +74,6 @@ export default class Field {
         const lastIndex = b.length - 1
         // draw from end to start
         for (let i = lastIndex; i >= 0; i--) {
-            console.log(i)
             this.drawCell(b[i])
         }
         this.drawGrid()
