@@ -14,11 +14,20 @@ class Game {
     private isRunning: boolean = false
     private dashboard: Dashboard
     private state: GameState = new GameState()
+    private isOver: boolean = false
 
     constructor(canvas: HTMLCanvasElement) {
         const snake = new Snake(getSnakeBody())
         const field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
-        this.navigator = new GameNavigator(snake, field, this.state.foodEaten.bind(this.state))
+        const callbacks = {
+            onEat: (foodCount: number) => this.state.foodEaten(foodCount),
+            onDie: () => {
+                this.gameOver()
+                console.log('dead!')
+            },
+        }
+
+        this.navigator = new GameNavigator(snake, field, callbacks)
         this.navigator.drawSnake()
         this.navigator.putNewFoodOnField()
     }
@@ -76,9 +85,17 @@ class Game {
     }
 
     start(gameSpeed: number = this.state.speed): void {
+        if (this.isOver) {
+            return
+        }
         this.stop()
         this.intervalID = window.setInterval(() => this.loop(), gameSpeed)
         this.isRunning = true
+    }
+
+    gameOver(): void {
+        this.stop()
+        this.isOver = true
     }
 
     stop(): void {

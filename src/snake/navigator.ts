@@ -3,13 +3,18 @@ import Snake from './snake'
 import Field from '../share/field'
 import Food from './food'
 import { FOOD_COLOR } from './constant'
+import { Callbacks } from './types'
 
 class GameNavigator {
     private food: Food
     private snake: Snake
     private field: Field
+    private onEat: Callbacks['onEat']
+    private onDie: Callbacks['onDie']
 
-    constructor(snake: Snake, field: Field, private onFoodInside: (foodCound: number) => void) {
+    constructor(snake: Snake, field: Field, callbacks: Callbacks) {
+        this.onEat = callbacks.onEat
+        this.onDie = callbacks.onDie
         this.snake = snake
         this.field = field
     }
@@ -65,10 +70,15 @@ class GameNavigator {
         if (this.field.isOutOfCanvas(newHeadCoords)) {
             this.correctPosition(newHeadCoords)
         }
+        if (this.isCellUnderSnake(newHeadCoords)) {
+            this.onDie()
+        }
+
+        // eat food
         if (this.isOnSamePosition(this.food.position, newHeadCoords)) {
             this.snake.isGrowing = true
             this.snake.foodInside++
-            this.onFoodInside(this.snake.foodInside)
+            this.onEat(this.snake.foodInside)
             this.putNewFoodOnField()
         }
         this.snake.setHead(newHeadCoords)

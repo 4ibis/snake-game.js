@@ -36,3 +36,8 @@ export type State = {
     steps: number
     food: number
 }
+
+export type Callbacks = {
+    onEat: (countFood: number) => void
+    onDie: () => void
+}

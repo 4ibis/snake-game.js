@@ -8,7 +8,7 @@ export const DIRECTIONS = {
 }
 
 export const SNAKE_COLORS = {
-    head: 'black',
+    head: '#003301',
     body: 'green',
 }
 
