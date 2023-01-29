@@ -93,12 +93,12 @@ __webpack_require__.r(__webpack_exports__);
 const width = 441;
 const height = 441;
 const CANVAS_PARAMS = {
-    id: 'canvas',
+    selector: '#canvas',
     size: [width, height],
     cellSize: 40,
     gridColor: '#000000',
     // todo: choose bg color
-    bgColor: '#ffffff',
+    bgColor: '#dadada',
 };
 
 
@@ -127,8 +127,8 @@ class Field {
         this.drawGrid();
     }
     pickColor([x, y]) {
+        // todo: separate field classes for snake and pixel
         const image = this.context.getImageData(x, y, 1, 1);
-        console.log('image', image);
         return image.data;
     }
     fillBackground(color) {
@@ -168,7 +168,6 @@ class Field {
         const lastIndex = b.length - 1;
         // draw from end to start
         for (let i = lastIndex; i >= 0; i--) {
-            console.log(i);
             this.drawCell(b[i]);
         }
         this.drawGrid();
@@ -201,6 +200,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "arrayToRGB": () => (/* binding */ arrayToRGB),
 /* harmony export */   "getSnakeBody": () => (/* binding */ getSnakeBody),
+/* harmony export */   "select": () => (/* binding */ select),
 /* harmony export */   "setupCanvas": () => (/* binding */ setupCanvas),
 /* harmony export */   "setupPicker": () => (/* binding */ setupPicker)
 /* harmony export */ });
@@ -233,6 +233,13 @@ const setupPicker = (colorsContainer) => {
         colorsContainer.insertAdjacentElement('beforeend', li);
     }
 };
+const select = (selector) => {
+    const element = document.querySelector(selector);
+    if (!element) {
+        throw Error('Element doesn`t exist');
+    }
+    return element;
+};
 
 
 /***/ }),
@@ -263,7 +270,7 @@ const DIRECTIONS = {
     left: 'left',
 };
 const SNAKE_COLORS = {
-    head: 'black',
+    head: '#003301',
     body: 'green',
 };
 const FOOD_COLOR = 'red';

@@ -43,12 +43,75 @@ __webpack_require__.r(__webpack_exports__);
 const width = 441;
 const height = 441;
 const CANVAS_PARAMS = {
-    id: 'canvas',
+    selector: '#canvas',
     size: [width, height],
     cellSize: 40,
     gridColor: '#000000',
     // todo: choose bg color
-    bgColor: '#ffffff',
+    bgColor: '#dadada',
+};
+
+
+/***/ }),
+
+/***/ "./src/share/event.ts":
+/*!****************************!*\
+  !*** ./src/share/event.ts ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getEmitter": () => (/* binding */ getEmitter)
+/* harmony export */ });
+class EventEmitter {
+    constructor() {
+        this.events = new Map();
+    }
+    /**
+     * subscribe method
+     */
+    on(event, listener) {
+        if (!this.events.get(event)) {
+            this.events.set(event, []);
+        }
+        this.events.get(event).push(listener);
+    }
+    /**
+     * unsubscribe method
+     */
+    off(event, listener) {
+        //
+        // todo: tests for this method
+        const callbacks = this.getCallbacks(event);
+        const callbackIndex = callbacks.indexOf(listener);
+        let removedCallback = null;
+        if (callbackIndex > -1) {
+            removedCallback = callbacks.splice(callbackIndex, 1);
+        }
+        return removedCallback;
+    }
+    emit(event, data) {
+        const callbacks = this.getCallbacks(event);
+        callbacks.forEach((listener) => {
+            listener(data);
+        });
+    }
+    getCallbacks(event) {
+        const isEvent = this.events.has(event);
+        if (!isEvent) {
+            console.info(`There is no Callbacks for Event "${event}"`);
+            return [];
+        }
+        return this.events.get(event);
+    }
+    destroy() {
+        this.events.clear();
+    }
+}
+const emittor = new EventEmitter();
+const getEmitter = () => {
+    return emittor;
 };
 
 
@@ -77,8 +140,8 @@ class Field {
         this.drawGrid();
     }
     pickColor([x, y]) {
+        // todo: separate field classes for snake and pixel
         const image = this.context.getImageData(x, y, 1, 1);
-        console.log('image', image);
         return image.data;
     }
     fillBackground(color) {
@@ -118,7 +181,6 @@ class Field {
         const lastIndex = b.length - 1;
         // draw from end to start
         for (let i = lastIndex; i >= 0; i--) {
-            console.log(i);
             this.drawCell(b[i]);
         }
         this.drawGrid();
@@ -151,6 +213,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "arrayToRGB": () => (/* binding */ arrayToRGB),
 /* harmony export */   "getSnakeBody": () => (/* binding */ getSnakeBody),
+/* harmony export */   "select": () => (/* binding */ select),
 /* harmony export */   "setupCanvas": () => (/* binding */ setupCanvas),
 /* harmony export */   "setupPicker": () => (/* binding */ setupPicker)
 /* harmony export */ });
@@ -183,6 +246,13 @@ const setupPicker = (colorsContainer) => {
         colorsContainer.insertAdjacentElement('beforeend', li);
     }
 };
+const select = (selector) => {
+    const element = document.querySelector(selector);
+    if (!element) {
+        throw Error('Element doesn`t exist');
+    }
+    return element;
+};
 
 
 /***/ }),
@@ -198,41 +268,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant */ "./src/snake/constant.ts");
-/* harmony import */ var _share_field__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../share/field */ "./src/share/field.ts");
-/* harmony import */ var _snake__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./snake */ "./src/snake/snake.ts");
-/* harmony import */ var _navigator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./navigator */ "./src/snake/navigator.ts");
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./state */ "./src/snake/state.ts");
-/* harmony import */ var _dashboard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./dashboard */ "./src/snake/dashboard.ts");
-/* harmony import */ var _share_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../share/utils */ "./src/share/utils.ts");
-/* harmony import */ var _share_constant__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../share/constant */ "./src/share/constant.ts");
-
-
-
-
-
-
-
 
 class Game {
-    constructor(canvas) {
+    constructor(events, state, navigator, dashboard) {
+        this.events = events;
+        this.state = state;
+        this.navigator = navigator;
+        this.dashboard = dashboard;
         this.isRunning = false;
-        this.state = new _state__WEBPACK_IMPORTED_MODULE_4__["default"]();
-        const snake = new _snake__WEBPACK_IMPORTED_MODULE_2__["default"]((0,_share_utils__WEBPACK_IMPORTED_MODULE_6__.getSnakeBody)());
-        const field = new _share_field__WEBPACK_IMPORTED_MODULE_1__["default"](canvas.getContext('2d'), _share_constant__WEBPACK_IMPORTED_MODULE_7__.CANVAS_PARAMS);
-        this.navigator = new _navigator__WEBPACK_IMPORTED_MODULE_3__["default"](snake, field, this.state.foodEaten.bind(this.state));
-        this.navigator.drawSnake();
-        this.navigator.putNewFoodOnField();
+        this.gameOver = false;
+        this.registerEvents();
     }
-    init(controls, dashboard) {
-        this.dashboard = new _dashboard__WEBPACK_IMPORTED_MODULE_5__["default"](dashboard, this.state.getState.bind(this.state));
-        this.state.updateDashboard = this.dashboard.update.bind(this.dashboard);
-        this.dashboard.update();
-        controls.speedUp.addEventListener('click', () => this.state.speedUp());
-        controls.speedDown.addEventListener('click', () => this.state.speedDown());
+    registerEvents() {
+        this.events.on("onSpeedChange" /* EVENT.onSpeedChange */, () => {
+            this.state.checkUpdateLevel();
+            this.start();
+        });
+        this.events.on("onStateUpdate" /* EVENT.onStateUpdate */, () => this.dashboard.update(this.state.state));
+        this.events.on("onDie" /* EVENT.onDie */, () => this.finish());
     }
     handleKeyInput(event) {
         const keyCode = event.code;
-        // console.log('keyCode', keyCode)
         const ALL_CONTROL_KEYS = [].concat(_constant__WEBPACK_IMPORTED_MODULE_0__.ARROW_KEYS, _constant__WEBPACK_IMPORTED_MODULE_0__.INCREASE_KEYS, _constant__WEBPACK_IMPORTED_MODULE_0__.DECREASE_KEYS);
         if (ALL_CONTROL_KEYS.includes(keyCode))
             event.preventDefault();
@@ -253,11 +309,12 @@ class Game {
     tuneSpeed(keyCode) {
         if (_constant__WEBPACK_IMPORTED_MODULE_0__.INCREASE_KEYS.includes(keyCode)) {
             this.state.speedUp();
-            this.start();
         }
-        if (_constant__WEBPACK_IMPORTED_MODULE_0__.DECREASE_KEYS.includes(keyCode)) {
+        else if (_constant__WEBPACK_IMPORTED_MODULE_0__.DECREASE_KEYS.includes(keyCode)) {
             this.state.speedDown();
-            this.start();
+        }
+        else {
+            throw Error(`wrong tune speed keyCode: ${keyCode}`);
         }
     }
     toggleStartStop() {
@@ -265,14 +322,27 @@ class Game {
     }
     loop() {
         this.navigator.move();
-        this.navigator.reDraw();
-        this.state.stepsUp();
-        // this.dashboard.update()
+        if (!this.gameOver) {
+            this.navigator.reDraw();
+        }
+        this.events.emit("onStateUpdate" /* EVENT.onStateUpdate */, this.state.state);
     }
     start(gameSpeed = this.state.speed) {
+        if (this.gameOver) {
+            return;
+        }
         this.stop();
+        // this.loop() // todo: better change speed algorithm
         this.intervalID = window.setInterval(() => this.loop(), gameSpeed);
         this.isRunning = true;
+    }
+    finish() {
+        console.info('Game is Over');
+        this.stop();
+        this.gameOver = true;
+        this.dashboard.showGameOver();
+        alert('GAME OVER');
+        location.reload();
     }
     stop() {
         if (this.intervalID) {
@@ -312,7 +382,7 @@ const DIRECTIONS = {
     left: 'left',
 };
 const SNAKE_COLORS = {
-    head: 'black',
+    head: '#003301',
     body: 'green',
 };
 const FOOD_COLOR = 'red';
@@ -352,22 +422,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Dashboard)
 /* harmony export */ });
 class Dashboard {
-    constructor(dashboard, stateGetter) {
-        this.dashboard = dashboard;
-        this.stateGetter = stateGetter;
+    constructor(dashboardView) {
+        this.dashboardView = dashboardView;
     }
-    update(state = this.stateGetter()) {
+    update(state) {
         for (const [key, value] of Object.entries(state)) {
-            this.dashboard[key].innerText = value.toString();
+            if (key === 'speed') {
+                this.updateSpeedView(value);
+                continue;
+            }
+            this.dashboardView[key].innerText = value.toString();
         }
     }
-    updateSpeedView() {
-        const state = this.stateGetter();
-        const speedValue = 1000 / state.speed;
-        this.dashboard.speed.innerText = speedValue.toFixed(1);
+    updateSpeedView(newSpeed) {
+        const speedValue = 1000 / newSpeed;
+        this.dashboardView.speed.innerText = speedValue.toFixed(1);
     }
-    updateSteps() {
-        this.dashboard.steps.innerText = this.stateGetter().steps.toString();
+    showGameOver() {
+        // todo: show game over popup
     }
 }
 
@@ -417,10 +489,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class GameNavigator {
-    constructor(snake, field, onFoodInside) {
-        this.onFoodInside = onFoodInside;
+    constructor(snake, field, events) {
         this.snake = snake;
         this.field = field;
+        this.events = events;
+        this.drawSnake();
+        this.putNewFoodOnField();
     }
     reDraw() {
         this.drawSnake();
@@ -454,18 +528,22 @@ class GameNavigator {
         this.field.drawFigure(this.food);
     }
     move() {
-        this.moveHeadForward();
+        const newHeadCoords = this.getNextCellCoords(this.snake.getHead().coords, this.snake.direction);
+        if (this.isCellUnderSnake(newHeadCoords)) {
+            this.events.emit("onDie" /* EVENT.onDie */);
+            return;
+        }
+        this.moveHeadForward(newHeadCoords);
         this.moveTail();
     }
-    moveHeadForward() {
-        const newHeadCoords = this.getNextCellCoords(this.snake.getHead().coords, this.snake.direction);
+    moveHeadForward(newHeadCoords) {
         if (this.field.isOutOfCanvas(newHeadCoords)) {
             this.correctPosition(newHeadCoords);
         }
+        // eat food
         if (this.isOnSamePosition(this.food.position, newHeadCoords)) {
             this.snake.isGrowing = true;
-            this.snake.foodInside++;
-            this.onFoodInside(this.snake.foodInside);
+            this.events.emit("onEat" /* EVENT.onEat */, ++this.snake.foodInside);
             this.putNewFoodOnField();
         }
         this.snake.setHead(newHeadCoords);
@@ -619,44 +697,48 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ GameState)
 /* harmony export */ });
 class GameState {
-    constructor() {
-        this._level = 1;
-        this._steps = 0;
-        this._speed = 500;
-        this.speedStep = 25;
+    constructor(events) {
+        this.events = events;
+        this.level = 1;
+        this.steps = 0;
+        this.speed_ = 500;
+        this.speedStep = 10;
         this.foodCount = 0;
+        this.events.on("onEat" /* EVENT.onEat */, (foodCount) => this.setFoodCount(foodCount));
     }
-    getState() {
+    get state() {
         return {
-            level: this._level,
-            steps: this._steps,
-            speed: this._speed,
+            level: this.level,
+            steps: this.steps,
+            speed: this.speed_,
             food: this.foodCount,
         };
     }
-    foodEaten(foodCount) {
+    setFoodCount(foodCount) {
         this.foodCount = foodCount;
-        this.updateDashboard(this.getState());
+    }
+    checkUpdateLevel() {
+        // increase level every 3 food
+        if (this.foodCount % 3 === 0) {
+            this.levelUp();
+        }
     }
     levelUp() {
-        this._level++;
-        this.updateDashboard(this.getState());
-    }
-    stepsUp() {
-        this._steps++;
-        this.updateDashboard(this.getState());
+        this.level++;
+        this.speedUp();
+        this.events.emit("onLevelUp" /* EVENT.onLevelUp */, this.level);
     }
     get speed() {
-        return this._speed;
+        return this.speed_;
     }
     speedUp() {
-        const newSpeed = this._speed - this.speedStep;
-        this._speed = newSpeed < 0 ? 0 : newSpeed;
-        this.updateDashboard(this.getState());
+        const newSpeed = this.speed_ - this.speedStep;
+        this.speed_ = newSpeed < 0 ? 0 : newSpeed;
+        this.events.emit("onSpeedChange" /* EVENT.onSpeedChange */, this.speed);
     }
     speedDown() {
-        this._speed = this._speed + this.speedStep;
-        this.updateDashboard(this.getState());
+        this.speed_ = this.speed_ + this.speedStep;
+        this.events.emit("onSpeedChange" /* EVENT.onSpeedChange */, this.speed);
     }
 }
 
@@ -730,27 +812,45 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _SnakeGame__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SnakeGame */ "./src/snake/SnakeGame.ts");
 /* harmony import */ var _share_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../share/utils */ "./src/share/utils.ts");
 /* harmony import */ var _share_constant__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../share/constant */ "./src/share/constant.ts");
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* harmony import */ var _share_event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../share/event */ "./src/share/event.ts");
+/* harmony import */ var _snake__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./snake */ "./src/snake/snake.ts");
+/* harmony import */ var _share_field__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../share/field */ "./src/share/field.ts");
+/* harmony import */ var _navigator__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./navigator */ "./src/snake/navigator.ts");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./state */ "./src/snake/state.ts");
+/* harmony import */ var _dashboard__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./dashboard */ "./src/snake/dashboard.ts");
 
 
 
 
-const select = (s) => document.querySelector(s);
-const canvas = document.getElementById(_share_constant__WEBPACK_IMPORTED_MODULE_3__.CANVAS_PARAMS.id);
+
+
+
+
+
+
+const canvas = (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.select)(_share_constant__WEBPACK_IMPORTED_MODULE_3__.CANVAS_PARAMS.selector);
 (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.setupCanvas)(canvas, _share_constant__WEBPACK_IMPORTED_MODULE_3__.CANVAS_PARAMS.size);
-const game = new _SnakeGame__WEBPACK_IMPORTED_MODULE_1__["default"](canvas);
 const controls = {
-    speedUp: select(_constant__WEBPACK_IMPORTED_MODULE_0__.CONTROLS_SELECTORS.speedUp),
-    speedDown: select(_constant__WEBPACK_IMPORTED_MODULE_0__.CONTROLS_SELECTORS.speedDown),
+    speedUp: (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.select)(_constant__WEBPACK_IMPORTED_MODULE_0__.CONTROLS_SELECTORS.speedUp),
+    speedDown: (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.select)(_constant__WEBPACK_IMPORTED_MODULE_0__.CONTROLS_SELECTORS.speedDown),
 };
-const dashboard = {
-    speed: select(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.speed),
-    level: select(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.level),
-    steps: select(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.steps),
-    food: select(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.food),
+const dashboardView = {
+    speed: (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.select)(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.speed),
+    level: (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.select)(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.level),
+    steps: (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.select)(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.steps),
+    food: (0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.select)(_constant__WEBPACK_IMPORTED_MODULE_0__.DASHBOARD_SELECTORS.food),
 };
-game.init(controls, dashboard);
+const emitter = (0,_share_event__WEBPACK_IMPORTED_MODULE_4__.getEmitter)();
+const state = new _state__WEBPACK_IMPORTED_MODULE_8__["default"](emitter);
+const dashboard = new _dashboard__WEBPACK_IMPORTED_MODULE_9__["default"](dashboardView);
+const navigator = new _navigator__WEBPACK_IMPORTED_MODULE_7__["default"](new _snake__WEBPACK_IMPORTED_MODULE_5__["default"]((0,_share_utils__WEBPACK_IMPORTED_MODULE_2__.getSnakeBody)()), new _share_field__WEBPACK_IMPORTED_MODULE_6__["default"](canvas.getContext('2d'), _share_constant__WEBPACK_IMPORTED_MODULE_3__.CANVAS_PARAMS), emitter);
+const game = new _SnakeGame__WEBPACK_IMPORTED_MODULE_1__["default"](emitter, state, navigator, dashboard);
+initControls(controls, state);
 document.addEventListener('keydown', (event) => game.handleKeyInput(event));
+function initControls(controls, state) {
+    controls.speedUp.addEventListener('click', () => state.speedUp());
+    controls.speedDown.addEventListener('click', () => state.speedDown());
+}
 
 })();
 

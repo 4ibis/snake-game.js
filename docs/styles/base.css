@@ -1,6 +1,7 @@
 body {
     margin: 0;
-    background-color: #dadada;
+    background-color: #242424;
+    color: white;
 }
 
 .container {
@@ -11,10 +12,18 @@ body {
     min-height: 100vh;
 }
 
-canvas {
-    /* margin: 0 auto; */
+.canvas-container {
     display: flex;
     justify-content: center;
-    background-color: white;
+}
 
+canvas {
+    display: flex;
+    justify-content: center;
+    background-color: #dadada;
+    margin: 1em;
+}
+
+canvas.border-red {
+    border: 2px solid red;
 }
