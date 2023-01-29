@@ -1,4 +1,4 @@
-import { EVENT, EventEmitter } from '../share/event'
+import { EVENT, IEventEmitter } from '../share/event'
 import { State } from './types'
 
 export default class GameState {
@@ -8,7 +8,7 @@ export default class GameState {
     private speedStep: number = 25
     private foodCount: number = 0
 
-    constructor(private events: EventEmitter) {
+    constructor(private events: IEventEmitter) {
         this.events.on(EVENT.onEat, (foodCount: number) => this.setFoodCount(foodCount))
     }
 

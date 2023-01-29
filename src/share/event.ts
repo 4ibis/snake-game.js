@@ -14,7 +14,14 @@ export const enum EVENT {
 
 type Events = Map<EVENT, EventCallback[]>
 
-export class EventEmitter {
+export interface IEventEmitter {
+    events: Events
+    on(event: EVENT, listener: EventCallback): void
+    off(event: EVENT, listener: EventCallback): void
+    emit(event: EVENT, data?: unknown): void
+}
+
+class EventEmitter implements IEventEmitter {
     events: Events = new Map()
 
     /**
@@ -62,4 +69,10 @@ export class EventEmitter {
     destroy() {
         this.events.clear()
     }
+}
+
+const emittor = new EventEmitter()
+
+export const getEmitter = () => {
+    return emittor
 }

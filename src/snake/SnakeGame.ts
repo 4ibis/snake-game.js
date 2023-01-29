@@ -1,31 +1,23 @@
 import { ARROW_KEYS, DECREASE_KEYS, INCREASE_KEYS, PLAY_PAUSE_KEYS } from './constant'
-import { Controls, DashboardView } from './types'
-import Field from '../share/field'
-import Snake from './snake'
+import { Controls } from './types'
 import GameNavigator from './navigator'
 import GameState from './state'
 import Dashboard from './dashboard'
-import { getSnakeBody } from '../share/utils'
-import { CANVAS_PARAMS } from '../share/constant'
-import { EVENT, EventEmitter } from '../share/event'
+import { EVENT, IEventEmitter } from '../share/event'
 
 class Game {
-    private events: EventEmitter
     private intervalID: number
-    public navigator: GameNavigator
     private isRunning: boolean = false
-    private dashboard: Dashboard
-    private state: GameState
     private gameOver: boolean = false
 
-    constructor(canvas: HTMLCanvasElement, dashboardView: DashboardView, controls: Controls) {
-        this.events = new EventEmitter()
-        const snake = new Snake(getSnakeBody())
-        const field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
-        this.navigator = new GameNavigator(snake, field, this.events)
+    constructor(
+        private events: IEventEmitter,
+        private state: GameState,
+        public navigator: GameNavigator,
+        private dashboard: Dashboard,
+        controls: Controls
+    ) {
         this.registerEvents()
-        this.dashboard = new Dashboard(dashboardView, this.events)
-        this.state = new GameState(this.events)
         this.state.updateDashboard = this.dashboard.update.bind(this.dashboard)
         this.initControls(controls)
     }
@@ -39,7 +31,7 @@ class Game {
         controls.speedDown.addEventListener('click', () => this.state.speedDown())
     }
 
-    handleKeyInput(event: KeyboardEvent) {
+    public handleKeyInput(event: KeyboardEvent) {
         const keyCode = event.code
         // console.log('keyCode', keyCode)
         const ALL_CONTROL_KEYS = [].concat(ARROW_KEYS, INCREASE_KEYS, DECREASE_KEYS)
@@ -89,7 +81,7 @@ class Game {
             return
         }
         this.stop()
-        this.loop() // todo: better chane speed algorithm
+        this.loop() // todo: better change speed algorithm
         this.intervalID = window.setInterval(() => this.loop(), gameSpeed)
         this.isRunning = true
     }

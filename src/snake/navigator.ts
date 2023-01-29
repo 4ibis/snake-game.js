@@ -3,12 +3,12 @@ import Snake from './snake'
 import Field from '../share/field'
 import Food from './food'
 import { FOOD_COLOR } from './constant'
-import { EVENT, EventEmitter } from '../share/event'
+import { EVENT, IEventEmitter } from '../share/event'
 
 class GameNavigator {
     private food: Food
 
-    constructor(private snake: Snake, private field: Field, private events: EventEmitter) {
+    constructor(private snake: Snake, private field: Field, private events: IEventEmitter) {
         this.drawSnake()
         this.putNewFoodOnField()
     }

@@ -1,8 +1,8 @@
-import { EVENT, EventEmitter } from '../share/event'
+import { EVENT, IEventEmitter } from '../share/event'
 import { DashboardView, State } from './types'
 
 export default class Dashboard {
-    constructor(private dashboard: DashboardView, private events: EventEmitter) {
+    constructor(private dashboard: DashboardView, private events: IEventEmitter) {
         this.events.on(EVENT.onStateUpdate, (state: State) => this.update(state))
     }
 
