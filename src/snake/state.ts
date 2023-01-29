@@ -2,23 +2,21 @@ import { EVENT, IEventEmitter } from '../share/event'
 import { State } from './types'
 
 export default class GameState {
-    private _level: number = 1
-    private _steps: number = 0
-    private _speed: number = 500
-    private speedStep: number = 25
+    private level: number = 1
+    private steps: number = 0
+    private speed_: number = 500
+    private speedStep: number = 10
     private foodCount: number = 0
 
     constructor(private events: IEventEmitter) {
         this.events.on(EVENT.onEat, (foodCount: number) => this.setFoodCount(foodCount))
     }
 
-    updateDashboard: (state: State) => void
-
     get state(): State {
         return {
-            level: this._level,
-            steps: this._steps,
-            speed: this._speed,
+            level: this.level,
+            steps: this.steps,
+            speed: this.speed_,
             food: this.foodCount,
         }
     }
@@ -27,23 +25,31 @@ export default class GameState {
         this.foodCount = foodCount
     }
 
+    public checkUpdateLevel() {
+        // increase level every 3 food
+        if (this.foodCount % 3 === 0) {
+            this.levelUp()
+        }
+    }
+
     levelUp() {
-        this._level++
-        this.events.emit(EVENT.onLevelUp, this._level)
+        this.level++
+        this.speedUp()
+        this.events.emit(EVENT.onLevelUp, this.level)
     }
 
     get speed() {
-        return this._speed
+        return this.speed_
     }
 
     public speedUp() {
-        const newSpeed = this._speed - this.speedStep
-        this._speed = newSpeed < 0 ? 0 : newSpeed
+        const newSpeed = this.speed_ - this.speedStep
+        this.speed_ = newSpeed < 0 ? 0 : newSpeed
         this.events.emit(EVENT.onSpeedChange, this.speed)
     }
 
-    public speedDown(): void {
-        this._speed = this._speed + this.speedStep
+    public speedDown() {
+        this.speed_ = this.speed_ + this.speedStep
         this.events.emit(EVENT.onSpeedChange, this.speed)
     }
 }

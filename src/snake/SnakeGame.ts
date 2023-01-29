@@ -1,9 +1,8 @@
 import { ARROW_KEYS, DECREASE_KEYS, INCREASE_KEYS, PLAY_PAUSE_KEYS } from './constant'
-import { Controls } from './types'
+import { EVENT, IEventEmitter } from '../share/event'
 import GameNavigator from './navigator'
 import GameState from './state'
 import Dashboard from './dashboard'
-import { EVENT, IEventEmitter } from '../share/event'
 
 class Game {
     private intervalID: number
@@ -13,27 +12,23 @@ class Game {
     constructor(
         private events: IEventEmitter,
         private state: GameState,
-        public navigator: GameNavigator,
-        private dashboard: Dashboard,
-        controls: Controls
+        private navigator: GameNavigator,
+        private dashboard: Dashboard
     ) {
         this.registerEvents()
-        this.state.updateDashboard = this.dashboard.update.bind(this.dashboard)
-        this.initControls(controls)
     }
 
     private registerEvents() {
+        this.events.on(EVENT.onSpeedChange, () => {
+            this.state.checkUpdateLevel()
+            this.start()
+        })
+        this.events.on(EVENT.onStateUpdate, () => this.dashboard.update(this.state.state))
         this.events.on(EVENT.onDie, () => this.finish())
-    }
-
-    initControls(controls: Controls) {
-        controls.speedUp.addEventListener('click', () => this.state.speedUp())
-        controls.speedDown.addEventListener('click', () => this.state.speedDown())
     }
 
     public handleKeyInput(event: KeyboardEvent) {
         const keyCode = event.code
-        // console.log('keyCode', keyCode)
         const ALL_CONTROL_KEYS = [].concat(ARROW_KEYS, INCREASE_KEYS, DECREASE_KEYS)
         if (ALL_CONTROL_KEYS.includes(keyCode)) event.preventDefault()
 
@@ -53,22 +48,21 @@ class Game {
         if (SPEED_KYES.includes(keyCode)) this.tuneSpeed(keyCode)
     }
 
-    tuneSpeed(keyCode: string) {
+    private tuneSpeed(keyCode: string) {
         if (INCREASE_KEYS.includes(keyCode)) {
             this.state.speedUp()
-            this.start()
-        }
-        if (DECREASE_KEYS.includes(keyCode)) {
+        } else if (DECREASE_KEYS.includes(keyCode)) {
             this.state.speedDown()
-            this.start()
+        } else {
+            throw Error(`wrong tune speed keyCode: ${keyCode}`)
         }
     }
 
-    toggleStartStop(): void {
+    private toggleStartStop(): void {
         this.isRunning ? this.stop() : this.start()
     }
 
-    loop(): void {
+    private loop(): void {
         this.navigator.move()
         if (!this.gameOver) {
             this.navigator.reDraw()
@@ -76,26 +70,26 @@ class Game {
         this.events.emit(EVENT.onStateUpdate, this.state.state)
     }
 
-    start(gameSpeed: number = this.state.speed): void {
+    private start(gameSpeed: number = this.state.speed): void {
         if (this.gameOver) {
             return
         }
         this.stop()
-        this.loop() // todo: better change speed algorithm
+        // this.loop() // todo: better change speed algorithm
         this.intervalID = window.setInterval(() => this.loop(), gameSpeed)
         this.isRunning = true
     }
 
-    finish(): void {
+    private finish(): void {
         console.info('Game is Over')
         this.stop()
         this.gameOver = true
-        // todo: show game over popup
+        this.dashboard.showGameOver()
         alert('GAME OVER')
         location.reload()
     }
 
-    stop(): void {
+    private stop(): void {
         if (this.intervalID) {
             clearInterval(this.intervalID)
             this.isRunning = false

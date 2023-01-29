@@ -13,16 +13,16 @@ class GameNavigator {
         this.putNewFoodOnField()
     }
 
-    reDraw() {
+    public reDraw() {
         this.drawSnake()
     }
 
-    drawSnake() {
+    private drawSnake() {
         this.field.drawFigure(this.snake)
         this.field.drawGrid()
     }
 
-    getNewFood(): Food {
+    private getNewFood(): Food {
         let coords: CellCoords
         do {
             coords = this.createRandomCell()
@@ -30,28 +30,28 @@ class GameNavigator {
         return new Food({ coords, color: FOOD_COLOR })
     }
 
-    isCellUnderSnake(cell: CellCoords): boolean {
+    private isCellUnderSnake(cell: CellCoords): boolean {
         const check = (cellOfSnake: Cell) => this.isOnSamePosition(cell, cellOfSnake.coords)
         return this.snake.body.some(check)
     }
 
-    getRandomNumber(min: number, max: number): number {
+    private getRandomNumber(min: number, max: number): number {
         const randomFloat = Math.random() * (min - max) + max
         return Math.floor(randomFloat)
     }
 
-    createRandomCell(): CellCoords {
+    private createRandomCell(): CellCoords {
         const x = this.getRandomNumber(0, this.field.maxXCell)
         const y = this.getRandomNumber(0, this.field.maxYCell)
         return [x, y]
     }
 
-    putNewFoodOnField(): void {
+    private putNewFoodOnField(): void {
         this.food = this.getNewFood()
         this.field.drawFigure(this.food)
     }
 
-    move() {
+    public move() {
         const newHeadCoords = this.getNextCellCoords(
             this.snake.getHead().coords,
             this.snake.direction
@@ -64,21 +64,20 @@ class GameNavigator {
         this.moveTail()
     }
 
-    moveHeadForward(newHeadCoords: CellCoords) {
+    private moveHeadForward(newHeadCoords: CellCoords) {
         if (this.field.isOutOfCanvas(newHeadCoords)) {
             this.correctPosition(newHeadCoords)
         }
         // eat food
         if (this.isOnSamePosition(this.food.position, newHeadCoords)) {
             this.snake.isGrowing = true
-            this.snake.foodInside++
-            this.events.emit(EVENT.onEat, this.snake.foodInside)
+            this.events.emit(EVENT.onEat, ++this.snake.foodInside)
             this.putNewFoodOnField()
         }
         this.snake.setHead(newHeadCoords)
     }
 
-    moveTail(): void {
+    private moveTail(): void {
         if (!this.snake.isGrowing) {
             this.field.clean(this.snake.popTail().coords)
         }
@@ -101,13 +100,13 @@ class GameNavigator {
         }
     }
 
-    public isOnSamePosition(cellA: CellCoords, cellB: CellCoords): boolean {
+    private isOnSamePosition(cellA: CellCoords, cellB: CellCoords): boolean {
         const [a_x, a_y] = cellA
         const [b_x, b_y] = cellB
         return a_x === b_x && a_y === b_y
     }
 
-    getNextCellCoords(cell: CellCoords, direction: string): CellCoords {
+    private getNextCellCoords(cell: CellCoords, direction: string): CellCoords {
         let [x, y] = cell
         let newHead = null
         switch (direction) {
@@ -129,7 +128,7 @@ class GameNavigator {
         return newHead
     }
 
-    turn(direction: string) {
+    public turn(direction: string) {
         this.snake.turn(direction)
     }
 }

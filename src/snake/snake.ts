@@ -51,25 +51,25 @@ class Snake implements BaseFieldFigure {
         }
     }
 
-    turnUp(): void {
+    private turnUp(): void {
         if (this.direction !== DIRECTIONS.down) {
             this.direction = DIRECTIONS.up
         }
     }
 
-    turnRight(): void {
+    private turnRight(): void {
         if (this.direction !== DIRECTIONS.left) {
             this.direction = DIRECTIONS.right
         }
     }
 
-    turnDown(): void {
+    private turnDown(): void {
         if (this.direction !== DIRECTIONS.up) {
             this.direction = DIRECTIONS.down
         }
     }
 
-    turnLeft(): void {
+    private turnLeft(): void {
         if (this.direction !== DIRECTIONS.right) {
             this.direction = DIRECTIONS.left
         }

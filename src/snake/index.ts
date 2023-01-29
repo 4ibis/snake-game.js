@@ -27,11 +27,21 @@ const dashboardView: DashboardView = {
 
 const emitter = getEmitter()
 const state = new GameState(emitter)
-const snake = new Snake(getSnakeBody())
-const field = new Field(canvas.getContext('2d'), CANVAS_PARAMS)
-const navigator = new GameNavigator(snake, field, emitter)
-const dashboard = new Dashboard(dashboardView, emitter)
+const dashboard = new Dashboard(dashboardView)
 
-const game = new Game(emitter, state, navigator, dashboard, controls)
+const navigator = new GameNavigator(
+    new Snake(getSnakeBody()),
+    new Field(canvas.getContext('2d'), CANVAS_PARAMS),
+    emitter
+)
+
+const game = new Game(emitter, state, navigator, dashboard)
+
+initControls(controls, state)
 
 document.addEventListener('keydown', (event) => game.handleKeyInput(event))
+
+function initControls(controls: Controls, state: GameState) {
+    controls.speedUp.addEventListener('click', () => state.speedUp())
+    controls.speedDown.addEventListener('click', () => state.speedDown())
+}
