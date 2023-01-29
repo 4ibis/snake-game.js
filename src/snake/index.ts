@@ -1,7 +1,7 @@
 import { CONTROLS_SELECTORS, DASHBOARD_SELECTORS } from './constant'
 import Game from './SnakeGame'
 import { Controls, DashboardView } from './types'
-import { getSnakeBody, setupCanvas } from '../share/utils'
+import { getSnakeBody, select, setupCanvas } from '../share/utils'
 import { CANVAS_PARAMS } from '../share/constant'
 import { getEmitter } from '../share/event'
 import Snake from './snake'
@@ -10,9 +10,7 @@ import GameNavigator from './navigator'
 import GameState from './state'
 import Dashboard from './dashboard'
 
-const select = (s: string): HTMLElement => document.querySelector(s)!
-
-const canvas = document.getElementById(CANVAS_PARAMS.id)! as HTMLCanvasElement
+const canvas = select<HTMLCanvasElement>(CANVAS_PARAMS.selector)
 setupCanvas(canvas, CANVAS_PARAMS.size)
 
 const controls: Controls = {

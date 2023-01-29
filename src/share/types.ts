@@ -1,5 +1,5 @@
 export interface CanvasParams {
-    id: string
+    selector: string
     size: [number, number]
     cellSize: number
     gridColor: string

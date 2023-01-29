@@ -29,3 +29,11 @@ export const setupPicker = (colorsContainer: HTMLElement): void => {
         colorsContainer.insertAdjacentElement('beforeend', li)
     }
 }
+
+export const select = <T = HTMLElement>(selector: string): T => {
+    const element = document.querySelector(selector)
+    if (!element) {
+        throw Error('Element doesn`t exist')
+    }
+    return element as T
+}
